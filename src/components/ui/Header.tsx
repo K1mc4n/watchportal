@@ -2,26 +2,43 @@
 
 "use client";
 
-// Impor yang mungkin kita butuhkan nanti
 import { useMiniApp } from "@neynar/react";
+import Image from 'next/image';
 
 export function Header() {
-  // Kita bisa ambil data pengguna nanti dari sini
   const { context } = useMiniApp();
+  const loggedInUser = context?.user;
 
   return (
-    // Ini adalah kontainer utama untuk header kita.
-    // Semua elemen header akan kita masukkan di sini.
-    <div className="flex h-16 items-center justify-between p-2">
+    // Kontainer utama header
+    <div className="flex h-16 items-center justify-between p-2 mb-4">
       
-      {/* Bagian Kiri Header (untuk Logo dan Nama) */}
+      {/* Bagian Kiri Header (Dikosongkan untuk sekarang) */}
       <div>
-        {/* Nanti kita isi di sini */}
+        {/*
+          Area ini sengaja dibiarkan kosong.
+          Nanti bisa diisi dengan logo, nama aplikasi, atau tombol kembali.
+        */}
       </div>
 
-      {/* Bagian Kanan Header (untuk Profil Pengguna) */}
+      {/* Bagian Kanan Header (Profil Pengguna) */}
       <div>
-        {/* Nanti kita isi di sini */}
+        {loggedInUser && (
+          <div>
+            {loggedInUser.pfpUrl ? (
+              <Image 
+                src={loggedInUser.pfpUrl} 
+                alt="Farcaster Profile Picture" 
+                width={40}
+                height={40}
+                className="w-10 h-10 rounded-full"
+                key={loggedInUser.fid}
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-neutral-700"></div>
+            )}
+          </div>
+        )}
       </div>
 
     </div>
