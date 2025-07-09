@@ -1,0 +1,18 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI1MDU3NSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweGM4QUJGNjc5ZTE0YWRkOUE2ZDZiNjg4MWNCRGI0YkNhNzQ4Q2QyRDAifQ",
+    "payload": "eyJkb21haW4iOiJ3YXRjaHBvcnRhbC52ZXJjZWwuYXBwIn0",
+    "signature": "MHgwN2VlYTgxMGY5ZDc1OGY4Y2M5YzI5MjFlNDA4NjM5N2IyMTQwZWVlNTkxYTQyYjQ1NzI0ZDU3NDllNDkzOTNjMzkyZmU3YzkzNzg5NWQxMmQxNTZhYjIyYmM3NmJmNmFkNzg1MTI2MmY5NjViMjg3ZjJmMjViZTIyZmFiYjY2YzFi"
+  },
+  "frame": {
+    "version": "1",
+    "name": "Watchcoin Portal",
+    "iconUrl": "https://watchportal.vercel.app/icon.png",
+    "homeUrl": "https://watchportal.vercel.app",
+    "imageUrl": "https://watchportal.vercel.app/api/opengraph-image",
+    "buttonTitle": "Launch Portal",
+    "splashImageUrl": "https://watchportal.vercel.app/splash.png",
+    "splashBackgroundColor": "#111111",
+    "webhookUrl": "https://watchportal.vercel.app/api/webhook"
+  }
+}
