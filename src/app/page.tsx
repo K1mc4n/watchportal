@@ -2,12 +2,10 @@
 
 import { Metadata } from 'next';
 import { APP_NAME, APP_DESCRIPTION, APP_OG_IMAGE_URL } from '~/lib/constants';
-import { getMiniAppEmbedMetadata } from '~/lib/utils';
+import { getMiniAppEmbedMetadata } from '~/lib/utils'; // Pastikan ini diimpor
 
-// Ini memastikan metadata dibuat ulang secara berkala agar tetap fresh
 export const revalidate = 300; 
 
-// Fungsi async untuk menghasilkan metadata, yang berjalan di server
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: APP_NAME,
@@ -18,29 +16,22 @@ export async function generateMetadata(): Promise<Metadata> {
       images: [APP_OG_IMAGE_URL],
     },
     other: {
-      // Perubahan utama: mengubah seluruh objek frame modern menjadi string JSON dalam satu tag
+      // Menggunakan format JSON yang benar untuk Mini App
       'fc:frame': JSON.stringify(getMiniAppEmbedMetadata()),
     },
   };
 }
 
-
-// Tampilan UI halaman ini tetap sama
+// UI halaman utama
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-900">
+    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-gray-50 dark:bg-gray-900">
       <div className="text-center space-y-4">
-        <h1 className="text-5xl font-bold text-gold">{APP_NAME}</h1>
-        <p className="text-xl text-gray-300">{APP_DESCRIPTION}</p>
-        <a 
-          href="/app" 
-          className="inline-block mt-4 px-6 py-3 bg-gold text-black rounded-lg hover:bg-gold/90"
-        >
-          Launch Portal
+        <h1 className="text-5xl font-bold text-[#7C65C1]">{APP_NAME}</h1>
+        <p className="text-xl text-gray-600 dark:text-gray-300">{APP_DESCRIPTION}</p>
+        <a href="/app" className="inline-block mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+          Launch App
         </a>
-        <p className="text-md text-gray-500 mt-2">
-            Open in a Farcaster client like Warpcast.
-        </p>
       </div>
     </main>
   );
