@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Mode terang akan kita buat gelap juga, sesuai tema hitam & emas */
+  --background: #111111; /* Latar belakang abu-abu sangat gelap */
+  --foreground: #ededed; /* Teks putih pudar agar tidak terlalu kontras */
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a; /* Latar belakang hitam pekat untuk mode gelap */
+    --foreground: #ededed;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: 'Inter', Helvetica, Arial, sans-serif;
+}
+
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+@layer base {
+  :root {
+    --radius: 0.5rem;
+  }
+}
