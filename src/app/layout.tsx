@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import "~/app/globals.css";
 import { Providers } from "~/app/providers";
 import { APP_NAME, APP_DESCRIPTION } from "~/lib/constants";
-// HAPUS BARIS INI: import { Chatbot } from "~/components/ui/Chatbot";
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -21,7 +20,6 @@ export default function RootLayout({
       <body>
         <Providers>
           {children}
-          {/* HAPUS BARIS INI: <Chatbot /> */}
         </Providers>
       </body>
     </html>
