@@ -1,16 +1,23 @@
-// src/components/ui/Header.tsx (Kode yang Benar)
+// src/components/ui/Header.tsx (Perbaikan)
 "use client";
 
 import { useState } from "react";
 import { useMiniApp } from "@neynar/react";
-import Image from "next/image"; // Menggunakan komponen Image yang lebih baik
+import Image from "next/image"; 
 import { APP_NAME } from "~/lib/constants";
 
 export function Header() {
-  // Ambil juga `isSDKLoaded` untuk mengecek status koneksi
-  const { isSDKLoaded, context } = useMiniApp();
+  // PERBAIKAN: Ambil 'actions' dari hook useMiniApp
+  const { isSDKLoaded, context, actions } = useMiniApp();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const loggedInUser = context?.user;
+
+  // Fungsi untuk menangani klik, dengan pengecekan untuk keamanan
+  const handleViewProfile = () => {
+    if (loggedInUser && actions.viewProfile) {
+      actions.viewProfile(loggedInUser.fid);
+    }
+  };
 
   return (
     <div className="relative">
@@ -19,14 +26,11 @@ export function Header() {
           Welcome to {APP_NAME}!
         </div>
 
-        {/* Kontainer untuk foto profil, diberi ukuran agar layout stabil */}
         <div className="h-10 w-10">
-          {/* 1. Tampilkan skeleton loading jika SDK belum siap */}
           {!isSDKLoaded && (
             <div className="h-10 w-10 animate-pulse rounded-full bg-gray-300 dark:bg-gray-700"></div>
           )}
 
-          {/* 2. Tampilkan profil HANYA JIKA SDK sudah siap DAN ada pengguna */}
           {isSDKLoaded && loggedInUser && (
             <div
               className="cursor-pointer"
@@ -48,13 +52,13 @@ export function Header() {
         </div>
       </div>
 
-      {/* Dropdown Menu Pengguna (Logika ini sudah benar) */}
       {isUserDropdownOpen && loggedInUser && (
         <div className="absolute top-full right-0 z-50 mt-1 w-fit rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-800">
           <div className="space-y-2 text-right">
             <h3
               className="cursor-pointer text-sm font-bold hover:underline"
-              onClick={() => context.viewProfile(loggedInUser.fid)}
+              // PERBAIKAN: Panggil fungsi handler yang benar
+              onClick={handleViewProfile}
             >
               {loggedInUser.displayName || loggedInUser.username}
             </h3>
