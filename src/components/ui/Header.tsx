@@ -1,4 +1,4 @@
-// src/components/ui/Header.tsx (Perbaikan)
+// src/components/ui/Header.tsx (Perbaikan Final)
 "use client";
 
 import { useState } from "react";
@@ -7,15 +7,14 @@ import Image from "next/image";
 import { APP_NAME } from "~/lib/constants";
 
 export function Header() {
-  // PERBAIKAN: Ambil 'actions' dari hook useMiniApp
   const { isSDKLoaded, context, actions } = useMiniApp();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const loggedInUser = context?.user;
 
-  // Fungsi untuk menangani klik, dengan pengecekan untuk keamanan
   const handleViewProfile = () => {
     if (loggedInUser && actions.viewProfile) {
-      actions.viewProfile(loggedInUser.fid);
+      // PERBAIKAN: Kirim fid sebagai objek sesuai tipe ViewProfileOptions
+      actions.viewProfile({ fid: loggedInUser.fid });
     }
   };
 
@@ -57,7 +56,6 @@ export function Header() {
           <div className="space-y-2 text-right">
             <h3
               className="cursor-pointer text-sm font-bold hover:underline"
-              // PERBAIKAN: Panggil fungsi handler yang benar
               onClick={handleViewProfile}
             >
               {loggedInUser.displayName || loggedInUser.username}
