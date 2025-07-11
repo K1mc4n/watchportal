@@ -1,4 +1,4 @@
-// src/components/ui/Header.tsx (Versi Diperbarui & Lebih Kokoh)
+// src/components/ui/Header.tsx (Perbaikan Final)
 "use client";
 
 import { useState } from "react";
@@ -13,18 +13,16 @@ export function Header() {
   const handleViewProfile = () => {
     if (loggedInUser && actions?.viewProfile) {
       actions.viewProfile({ fid: loggedInUser.fid });
-      setIsUserDropdownOpen(false); // Tutup dropdown setelah diklik
+      setIsUserDropdownOpen(false);
     }
   };
 
-  // 1. Tampilan saat loading atau jika tidak ada pengguna
   const LoadingOrLoggedOutState = () => (
     <div className="flex h-16 items-center justify-end px-2">
       <div className="w-10 h-10 rounded-full bg-neutral-700 animate-pulse"></div>
     </div>
   );
 
-  // 2. Tampilan jika sudah login
   const LoggedInState = () => (
     <div className="relative mb-2">
       <div className="flex h-16 items-center justify-end px-2">
@@ -33,7 +31,6 @@ export function Header() {
             className="cursor-pointer"
             onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
           >
-            {/* 3. Pastikan pfpUrl ada sebelum merender komponen Image */}
             {loggedInUser?.pfpUrl ? (
               <Image 
                 src={loggedInUser.pfpUrl} 
@@ -44,9 +41,9 @@ export function Header() {
                 key={loggedInUser.fid}
               />
             ) : (
-              // Placeholder jika pfpUrl tidak ada tapi user sudah login
               <div className="w-10 h-10 rounded-full border-2 border-gold bg-neutral-700 flex items-center justify-center text-white font-bold">
-                {loggedInUser?.username.charAt(0).toUpperCase()}
+                {/* --- PERBAIKAN DI SINI --- */}
+                {loggedInUser?.username?.charAt(0).toUpperCase()}
               </div>
             )}
           </div>
@@ -58,8 +55,10 @@ export function Header() {
                   className="font-bold text-sm hover:underline cursor-pointer"
                   onClick={handleViewProfile}
                 >
+                  {/* --- DAN DI SINI --- */}
                   {loggedInUser?.displayName || loggedInUser?.username}
                 </h3>
+                {/* --- DAN DI SINI --- */}
                 <p className="text-xs text-gray-400">@{loggedInUser?.username}</p>
               </div>
             </div>
@@ -69,11 +68,9 @@ export function Header() {
     </div>
   );
 
-  // Jika tidak ada user, tampilkan state loading.
   if (!loggedInUser) {
     return <LoadingOrLoggedOutState />;
   }
   
-  // Jika ada user, tampilkan profilnya.
   return <LoggedInState />;
 }
