@@ -2,18 +2,18 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useMiniApp } from "@neynar/react";
-import { useDebounce } from 'use-debounce'; // Kita tambahkan lagi fitur pencarian
+import { useDebounce } from 'use-debounce';
+import Image from 'next/image'; // <- Pastikan impor ini ada
 
 import { Header } from "~/components/ui/Header";
 import { Footer } from "~/components/ui/Footer";
 import { MiniAppCard } from "./ui/MiniAppCard";
 import { MiniAppCardSkeleton } from "./ui/MiniAppCardSkeleton";
-import { miniAppsData, type MiniApp } from "~/lib/miniAppsData"; // Impor data statis dan tipenya
+import { miniAppsData, type MiniApp } from "~/lib/miniAppsData";
 
 export default function Demo({ title }: { title?: string }) {
   const { isSDKLoaded, context, actions } = useMiniApp();
   
-  // --- STATE MANAGEMENT ---
   const [communityApps, setCommunityApps] = useState<MiniApp[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,27 +22,22 @@ export default function Demo({ title }: { title?: string }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
 
-  // --- DATA FETCHING ---
   useEffect(() => {
     const fetchCommunityApps = async () => {
-      // Kita tidak set isLoading di sini agar daftar featured bisa langsung tampil
       try {
         const response = await fetch('/api/apps/approved');
         if (!response.ok) {
           throw new Error('Could not load community apps.');
         }
         const data = await response.json();
-
-        // Pastikan tidak ada data duplikat dengan yang sudah ada di daftar statis
         const existingUrls = new Set(miniAppsData.map(app => app.url));
         const newApps = (data.apps || []).filter((app: MiniApp) => !existingUrls.has(app.url));
-
         setCommunityApps(newApps);
       } catch (err) {
         console.error(err);
         setError(err instanceof Error ? err.message : 'An error occurred.');
       } finally {
-        setIsLoading(false); // Selesai loading setelah mencoba fetch data komunitas
+        setIsLoading(false);
       }
     };
 
@@ -59,27 +54,47 @@ export default function Demo({ title }: { title?: string }) {
 
   const chains = ['All', 'Base', 'Optimism', 'Degen', 'Multi-chain', 'Arbitrum'];
 
-  // --- FILTERING LOGIC ---
-  const filterFunction = (app: MiniApp) => {
-    const chainMatch = selectedChain === 'All' || app.chain === selectedChain;
-    const term = debouncedSearchTerm.toLowerCase();
-    const searchMatch = !term || 
-      app.name.toLowerCase().includes(term) ||
-      app.description.toLowerCase().includes(term) ||
-      app.tags.some(tag => tag.toLowerCase().includes(term));
-    return chainMatch && searchMatch;
-  };
-  
-  const filteredFeaturedApps = useMemo(() => miniAppsData.filter(filterFunction), [selectedChain, debouncedSearchTerm]);
-  const filteredCommunityApps = useMemo(() => communityApps.filter(filterFunction), [selectedChain, debouncedSearchTerm, communityApps]);
+  const filteredFeaturedApps = useMemo(() => {
+    const filterFunction = (app: MiniApp) => {
+      const chainMatch = selectedChain === 'All' || app.chain === selectedChain;
+      const term = debouncedSearchTerm.toLowerCase();
+      const searchMatch = !term || 
+        app.name.toLowerCase().includes(term) ||
+        app.description.toLowerCase().includes(term) ||
+        app.tags.some(tag => tag.toLowerCase().includes(term));
+      return chainMatch && searchMatch;
+    };
+    return miniAppsData.filter(filterFunction);
+  }, [selectedChain, debouncedSearchTerm]);
 
-  // --- RENDER ---
+  const filteredCommunityApps = useMemo(() => {
+    const filterFunction = (app: MiniApp) => {
+      const chainMatch = selectedChain === 'All' || app.chain === selectedChain;
+      const term = debouncedSearchTerm.toLowerCase();
+      const searchMatch = !term || 
+        app.name.toLowerCase().includes(term) ||
+        app.description.toLowerCase().includes(term) ||
+        app.tags.some(tag => tag.toLowerCase().includes(term));
+      return chainMatch && searchMatch;
+    };
+    return communityApps.filter(filterFunction);
+  }, [selectedChain, debouncedSearchTerm, communityApps]);
+
   return (
     <div style={{ paddingTop: context?.client.safeAreaInsets?.top ?? 0 }}>
       <div className="mx-auto py-2 px-4 pb-20">
         <Header />
-        <h1 className="text-2xl font-bold text-center mb-1">{title}</h1>
-        <p className="text-center text-gray-500 mb-6">Your portal to crypto apps and news.</p>
+        
+        {/* Teks judul dan deskripsi diganti dengan gambar */}
+        <div className="flex justify-center my-4">
+          <Image
+            src="/Midlogo.png"
+            alt="Watch Portal Logo"
+            width={300}
+            height={80}
+            priority
+          />
+        </div>
         
         {/* Search Input */}
         <div className="px-2 mb-6">
