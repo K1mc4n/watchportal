@@ -2,13 +2,11 @@
 'use client';
 
 import { useState } from 'react';
-// 1. Impor ikon baru untuk Quests. Kita gunakan 'ListChecks'
 import { Home, Newspaper, PlusSquare, MessageCircle, Trophy, Swords, ListChecks, type LucideIcon } from 'lucide-react'; 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChatWindow } from '~/components/ui/ChatWindow';
 
-// Komponen NavItem tetap sama
 const NavItem = ({ href, icon: Icon, label, isActive }: { href: string; icon: LucideIcon; label: string; isActive: boolean; }) => (
   <Link href={href} className="flex-1">
     <div className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${isActive ? 'text-gold' : 'text-gray-500 hover:text-gold'}`}>
@@ -18,7 +16,6 @@ const NavItem = ({ href, icon: Icon, label, isActive }: { href: string; icon: Lu
   </Link>
 );
 
-// Komponen ChatButton tetap sama
 const ChatButton = ({ onClick, isActive }: { onClick: () => void; isActive: boolean; }) => (
     <div className="flex-1" onClick={onClick}>
         <div className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors cursor-pointer ${isActive ? 'text-gold' : 'text-gray-500 hover:text-gold'}`}>
@@ -35,15 +32,15 @@ export function Footer() {
   const handleToggleChat = () => setIsChatOpen(!isChatOpen);
   const handleCloseChat = () => setIsChatOpen(false);
 
-  // 2. Perbarui logika `getActiveTab` untuk mengenali halaman `/quests`
   const getActiveTab = (): 'home' | 'news' | 'submit' | 'quiz' | 'quests' | 'leaderboard' | 'chat' | null => {
     if (isChatOpen) return 'chat';
     if (pathname.startsWith('/leaderboard')) return 'leaderboard';
     if (pathname.startsWith('/quiz')) return 'quiz';
-    if (pathname.startsWith('/quests')) return 'quests'; // <-- Tambahkan ini
+    if (pathname.startsWith('/quests')) return 'quests';
     if (pathname.startsWith('/news')) return 'news';
     if (pathname.startsWith('/submit')) return 'submit';
-    if (pathname.startsWith('/app')) return 'home';
+    // ==== PERUBAHAN DI SINI: Tab Home aktif jika path adalah '/' ====
+    if (pathname === '/') return 'home'; 
     return null;
   };
 
@@ -54,14 +51,11 @@ export function Footer() {
       {isChatOpen && <ChatWindow onClose={handleCloseChat} />}
 
       <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-700 shadow-lg">
-        {/* Sekarang 7 kolom */}
         <div className="flex justify-around max-w-lg mx-auto px-1">
-          <NavItem href="/app" icon={Home} label="Home" isActive={activeTab === 'home'} />
+          {/* ==== PERUBAHAN DI SINI: href mengarah ke "/" ==== */}
+          <NavItem href="/" icon={Home} label="Home" isActive={activeTab === 'home'} />
           <NavItem href="/news" icon={Newspaper} label="News" isActive={activeTab === 'news'} />
-          
-          {/* 3. TOMBOL QUESTS BARU DITAMBAHKAN DI SINI */}
           <NavItem href="/quests" icon={ListChecks} label="Quests" isActive={activeTab === 'quests'} />
-          
           <NavItem href="/quiz" icon={Swords} label="Challenge" isActive={activeTab === 'quiz'} />
           <NavItem href="/leaderboard" icon={Trophy} label="Leaders" isActive={activeTab === 'leaderboard'} />
           <NavItem href="/submit" icon={PlusSquare} label="Submit" isActive={activeTab === 'submit'} />
