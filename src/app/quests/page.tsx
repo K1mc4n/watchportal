@@ -1,7 +1,8 @@
-// src/app/quests/page.tsx (Versi dengan verifikasi)
+// Lokasi file: src/app/quests/page.tsx
+
 "use client";
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useMiniApp } from '@neynar/react';
 import { Header } from '~/components/ui/Header';
@@ -33,7 +34,6 @@ export default function QuestsPage() {
   const [verifyingQuestId, setVerifyingQuestId] = useState<number | null>(null);
 
   const fetchQuestData = async () => {
-      // Fungsi ini tidak berubah
       setIsLoading(true);
       try {
         const questsResponse = await fetch('/api/quests/list');
@@ -56,9 +56,6 @@ export default function QuestsPage() {
     fetchQuestData();
   }, [userFid]);
 
-  // ===============================================
-  // FUNGSI BARU UNTUK VERIFIKASI
-  // ===============================================
   const handleVerify = async (questId: number) => {
     if (!userFid) {
       alert("Please login to verify quests.");
@@ -73,14 +70,13 @@ export default function QuestsPage() {
       });
       const result = await response.json();
       if (result.success) {
-        alert("Quest completed! 🎉");
-        // Refresh data untuk menampilkan status "Done"
-        await fetchQuestData(); 
+        alert(result.message || "Quest completed! 🎉");
+        await fetchQuestData(); // Refresh data untuk update UI
       } else {
         alert(`Verification failed: ${result.message || 'Please ensure you have completed the task.'}`);
       }
     } catch (error) {
-      alert("An error occurred during verification.");
+      alert("An error occurred during verification. Please try again later.");
       console.error(error);
     } finally {
       setVerifyingQuestId(null);
@@ -89,7 +85,6 @@ export default function QuestsPage() {
 
 
   const isQuestCompleted = (quest: Quest): boolean => {
-    // ... (fungsi ini tidak berubah)
     const completion = completions.find(c => c.quest_id === quest.id);
     if (!completion) return false;
     if (!quest.is_recurring) return true;
@@ -99,21 +94,23 @@ export default function QuestsPage() {
     return completionDate > sevenDaysAgo;
   };
 
-  // ===============================================
-  // FUNGSI RENDER DIPERBARUI
-  // ===============================================
   const renderQuestAction = (quest: Quest) => {
     const isLoading = verifyingQuestId === quest.id;
 
     if (quest.verification_logic === 'complete_weekly_quiz') {
       return (
         <Link href="/quiz">
-          <Button isLoading={isLoading}>Start</Button>
+          <Button isLoading={isLoading}>Start Quiz</Button>
         </Link>
       );
     }
-    // Logika baru untuk quest follow
-    if (quest.verification_logic.startsWith('follow_fid:')) {
+    
+    // Kelompokkan semua quest yang bisa diverifikasi secara manual
+    if (
+        quest.verification_logic.startsWith('follow_fid:') ||
+        quest.verification_logic.startsWith('hold_token:') ||
+        quest.verification_logic.startsWith('hold_nft:')
+    ) {
       return (
         <Button onClick={() => handleVerify(quest.id)} isLoading={isLoading}>
           Verify
@@ -121,11 +118,9 @@ export default function QuestsPage() {
       );
     }
     
+    // Fallback untuk quest yang belum terdefinisi
     return <Button disabled>Start</Button>;
   };
-
-  // ... (sisa JSX tidak berubah, sama seperti sebelumnya) ...
-  const questsToShow = quests;
 
   return (
     <div>
@@ -142,9 +137,9 @@ export default function QuestsPage() {
               <LoaderCircle className="animate-spin h-10 w-10 text-gold" />
             </div>
           ) : (
-            questsToShow.length > 0 ? (
+            quests.length > 0 ? (
               <div className="space-y-4">
-                {questsToShow.map(quest => {
+                {quests.map(quest => {
                   const completed = isQuestCompleted(quest);
                   return (
                     <div key={quest.id} className={`bg-neutral-800 p-4 rounded-lg border border-neutral-700 flex items-center justify-between transition-opacity ${completed ? 'opacity-60' : ''}`}>
@@ -153,14 +148,16 @@ export default function QuestsPage() {
                         <p className="text-sm text-neutral-400 mt-1">{quest.description}</p>
                         <p className="text-sm font-bold text-gold mt-2">{quest.points} Points</p>
                       </div>
-                      {completed ? (
-                        <div className="flex items-center gap-2 text-green-400 font-semibold px-4">
-                          <CheckCircle size={20} />
-                          <span>Done</span>
-                        </div>
-                      ) : (
-                        renderQuestAction(quest)
-                      )}
+                      <div className="flex-shrink-0 ml-4">
+                        {completed ? (
+                          <div className="flex items-center gap-2 text-green-400 font-semibold px-4">
+                            <CheckCircle size={20} />
+                            <span>Done</span>
+                          </div>
+                        ) : (
+                          renderQuestAction(quest)
+                        )}
+                      </div>
                     </div>
                   );
                 })}
