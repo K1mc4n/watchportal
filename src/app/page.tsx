@@ -1,13 +1,16 @@
 // src/app/page.tsx
 
-import { Metadata } from 'next';
-import Image from 'next/image'; // Impor komponen Image
+import type { Metadata } from 'next';
+import dynamic from 'next/dynamic';
 import { APP_NAME, APP_DESCRIPTION, APP_OG_IMAGE_URL } from '~/lib/constants';
 import { getMiniAppEmbedMetadata } from '~/lib/utils';
+import AppLoading from '~/components/AppLoading';
 
+// Revalidasi dan dynamic export ini penting untuk halaman mini-app
 export const revalidate = 300; 
+export const dynamic = 'force-dynamic';
 
-// Bagian metadata ini sudah benar dan menggunakan format modern
+// Fungsi ini akan tetap membuat metadata untuk Farcaster Frame
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: APP_NAME,
@@ -23,40 +26,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+// Impor komponen <Demo> secara dinamis, sama seperti di halaman /app sebelumnya
+// Ini akan menampilkan komponen loading selagi konten utama disiapkan.
+const Demo = dynamic(() => import('~/components/Demo'), {
+  ssr: false,
+  loading: () => <AppLoading />, 
+});
 
-// --- INI BAGIAN TAMPILAN YANG DIPERBARUI ---
-// Komponen halaman utama yang sudah disesuaikan dengan tema Anda
+// Sekarang, halaman utama akan langsung merender komponen Demo
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-[#111111]">
-      <div className="text-center space-y-6">
-        {/* Menambahkan Logo di atas judul */}
-        <Image 
-            src="/watchcoin-logo.png" // Pastikan file ini ada di /public
-            alt="Watchcoin Portal Logo"
-            width={120}
-            height={120}
-            className="mx-auto"
-        />
-        {/* Judul dengan warna emas */}
-        <h1 className="text-5xl font-bold text-gold">{APP_NAME}</h1>
-        
-        {/* Deskripsi dengan warna abu-abu terang */}
-        <p className="text-xl text-gray-300">{APP_DESCRIPTION}</p>
-        
-        {/* Tombol CTA dengan gaya yang sesuai tema */}
-        <a 
-          href="/app" 
-          className="inline-block px-8 py-3 bg-gold text-black font-semibold rounded-lg shadow-lg shadow-gold/20 transition-transform hover:scale-105"
-        >
-          Launch Portal
-        </a>
-        
-        {/* Teks bantuan untuk pengguna browser biasa */}
-        <p className="text-md text-gray-500 pt-2">
-            Open in a Farcaster client like Warpcast.
-        </p>
-      </div>
-    </main>
-  );
+  return <Demo title={APP_NAME} />;
 }
