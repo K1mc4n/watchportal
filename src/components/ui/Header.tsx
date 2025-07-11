@@ -1,9 +1,11 @@
-// src/components/ui/Header.tsx (Perbaikan Final)
+// src/components/ui/Header.tsx (Versi dengan Tombol "Buy Watch")
 "use client";
 
 import { useState } from "react";
 import { useMiniApp } from "@neynar/react";
 import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from './Button'; // <-- Impor komponen Button
 
 export function Header() {
   const { context, actions } = useMiniApp();
@@ -16,16 +18,47 @@ export function Header() {
       setIsUserDropdownOpen(false);
     }
   };
-
-  const LoadingOrLoggedOutState = () => (
-    <div className="flex h-16 items-center justify-end px-2">
-      <div className="w-10 h-10 rounded-full bg-neutral-700 animate-pulse"></div>
-    </div>
-  );
+  
+  // --- Fungsi untuk membuka link eksternal ---
+  const handleBuyLink = () => {
+    const buyUrl = 'https://streme.fun/token/0x2bb8fd57ac1e62194d56cd7680a067278c505e29';
+    if (actions?.openUrl) {
+      // Gunakan SDK jika tersedia untuk pengalaman terbaik di dalam Mini App
+      actions.openUrl(buyUrl);
+    } else {
+      // Fallback untuk browser biasa
+      window.open(buyUrl, '_blank', 'noopener,noreferrer');
+    }
+  };
 
   const LoggedInState = () => (
     <div className="relative mb-2">
-      <div className="flex h-16 items-center justify-end px-2">
+      <div className="flex h-16 items-center justify-between px-2 gap-2">
+        {/* Kontainer untuk item di sebelah kiri */}
+        <div className="flex items-center gap-3">
+          {/* Logo */}
+          <Link href="/app" className="flex items-center">
+            <Image
+              src="/Midlogo.png"
+              alt="Watch Portal Logo"
+              width={36}
+              height={36}
+              className="rounded-md"
+              priority
+              unoptimized={true}
+            />
+          </Link>
+          {/* TOMBOL "BUY WATCH" YANG BARU */}
+          <Button 
+            onClick={handleBuyLink}
+            variant="secondary" // Menggunakan varian 'secondary' agar tidak terlalu mencolok
+            size="sm" // Ukuran lebih kecil agar pas di header
+          >
+            Buy Watch
+          </Button>
+        </div>
+        
+        {/* Kontainer untuk item di sebelah kanan (Profil Pengguna) */}
         <div className="relative">
           <div 
             className="cursor-pointer"
@@ -42,7 +75,6 @@ export function Header() {
               />
             ) : (
               <div className="w-10 h-10 rounded-full border-2 border-gold bg-neutral-700 flex items-center justify-center text-white font-bold">
-                {/* --- PERBAIKAN DI SINI --- */}
                 {loggedInUser?.username?.charAt(0).toUpperCase()}
               </div>
             )}
@@ -55,16 +87,26 @@ export function Header() {
                   className="font-bold text-sm hover:underline cursor-pointer"
                   onClick={handleViewProfile}
                 >
-                  {/* --- DAN DI SINI --- */}
                   {loggedInUser?.displayName || loggedInUser?.username}
                 </h3>
-                {/* --- DAN DI SINI --- */}
                 <p className="text-xs text-gray-400">@{loggedInUser?.username}</p>
               </div>
             </div>
           )}
         </div>
       </div>
+    </div>
+  );
+
+  const LoadingOrLoggedOutState = () => (
+    <div className="flex h-16 items-center justify-between px-2">
+      {/* Placeholder untuk bagian kiri */}
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 bg-neutral-700 rounded-md animate-pulse" />
+        <div className="w-24 h-9 bg-neutral-700 rounded-md animate-pulse" />
+      </div>
+      {/* Placeholder untuk bagian kanan */}
+      <div className="w-10 h-10 rounded-full bg-neutral-700 animate-pulse"></div>
     </div>
   );
 
