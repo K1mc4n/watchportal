@@ -1,10 +1,10 @@
-// src/components/ui/Header.tsx (Versi Baru)
+// src/components/ui/Header.tsx (Versi Baru dengan Logo yang Benar)
 "use client";
 
 import { useState } from "react";
 import { useMiniApp } from "@neynar/react";
 import Image from 'next/image';
-import Link from 'next/link'; // <-- Impor komponen Link
+import Link from 'next/link';
 
 export function Header() {
   const { context, actions } = useMiniApp();
@@ -18,23 +18,21 @@ export function Header() {
     }
   };
 
-  // State saat loading atau logout, sekarang dengan layout yang seimbang
   const LoadingOrLoggedOutState = () => (
     <div className="flex h-16 items-center justify-between px-2">
-      <div className="w-10 h-10" /> {/* Placeholder untuk logo agar layout tidak bergeser */}
+      <div className="w-10 h-10" />
       <div className="w-10 h-10 rounded-full bg-neutral-700 animate-pulse"></div>
     </div>
   );
 
-  // State saat sudah login
   const LoggedInState = () => (
     <div className="relative mb-2">
-      {/* UBAH BARIS INI: Gunakan justify-between untuk memisahkan item */}
       <div className="flex h-16 items-center justify-between px-2">
-        {/* TAMBAHKAN BLOK INI: Logo di sebelah kiri */}
+        {/* Logo di sebelah kiri */}
         <Link href="/app" className="flex items-center gap-2">
+          {/* ==== PERUBAHAN DI SINI ==== */}
           <Image
-            src="/watchcoin-logo.png" // Menggunakan logo yang lebih kecil
+            src="/Midlogo.png" // Menggunakan path yang Anda berikan
             alt="Watch Portal Logo"
             width={36}
             height={36}
@@ -43,7 +41,7 @@ export function Header() {
           <span className="font-bold text-lg hidden sm:inline text-gold">Watch Portal</span>
         </Link>
         
-        {/* Kode profil pengguna yang sudah ada sebelumnya */}
+        {/* Kode profil pengguna */}
         <div className="relative">
           <div 
             className="cursor-pointer"
