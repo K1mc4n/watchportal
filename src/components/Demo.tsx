@@ -1,3 +1,4 @@
+// src/components/Demo.tsx (Versi Baru)
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -85,20 +86,10 @@ export default function Demo({ title }: { title?: string }) {
       <div className="mx-auto py-2 px-4 pb-20">
         <Header />
         
-        {/* GAMBAR HEADER DENGAN NAMA FILE YANG BENAR */}
-        <div className="flex justify-center mb-4 px-2">
-          <Image
-            src="/Midlogo.png" // <- NAMA FILE DIGANTI DI SINI
-            alt="Watch Portal"
-            width={800} 
-            height={260} 
-            priority
-            className="w-full max-w-xl object-contain"
-          />
-        </div>
+        {/* BLOK GAMBAR LOGO DI TENGAH TELAH DIHAPUS DARI SINI */}
         
         {/* Search Input */}
-        <div className="px-2 mb-6">
+        <div className="px-2 mb-6 mt-4"> {/* Menambahkan margin top untuk memberi ruang setelah header */}
           <input
             type="text"
             value={searchTerm}
@@ -169,4 +160,4 @@ export default function Demo({ title }: { title?: string }) {
       <Footer />
     </div>
   );
-        }
+}
