@@ -1,4 +1,4 @@
-// src/app/api/quiz/submit-score/route.ts
+// Pastikan file ini berisi kode ini: src/app/api/quiz/submit-score/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '~/lib/supabase';
 import { correctAnswers } from '~/lib/quizQuestions';
@@ -6,100 +6,71 @@ import { getWeek } from 'date-fns';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userFid, username, pfpUrl, userAnswers } = body;
+    const { userFid, username, pfpUrl, userAnswers } = await request.json();
 
-    // 1. Validasi Input
     if (!userFid || !username || !userAnswers) {
-      console.error('Submit Score Error: Missing required data in request body.', body);
-      return NextResponse.json({ error: 'Missing required data: fid, username, and answers are required.' }, { status: 400 });
+      console.error('Submit Score Error: Missing required data in request body.');
+      return NextResponse.json({ error: 'Missing required data' }, { status: 400 });
     }
 
-    // 2. Hitung Skor Kuis
     let score = 0;
     userAnswers.forEach((answer: { questionId: number, answerIndex: number }) => {
-      if (correctAnswers.get(answer.questionId) === answer.answerIndex) {
-        score++;
-      }
+      if (correctAnswers.get(answer.questionId) === answer.answerIndex) score++;
     });
-    console.log(`User FID: ${userFid} | Calculated Quiz Score: ${score}`);
+    console.log(`[FID: ${userFid}] Calculated Quiz Score: ${score}`);
 
-    // 3. Simpan Skor ke tabel 'weekly_quiz_scores'
     const weekIdentifier = `${new Date().getFullYear()}-${getWeek(new Date())}`;
-    const { error: scoreInsertError } = await supabase.from('weekly_quiz_scores').insert({
-      user_fid: userFid,
-      username: username,
-      pfp_url: pfpUrl,
-      score: score,
-      week_identifier: weekIdentifier,
-    });
-
-    if (scoreInsertError) {
-      console.error(`Supabase error saving quiz score for FID ${userFid}:`, scoreInsertError);
-      throw new Error(`Failed to save quiz score: ${scoreInsertError.message}`);
-    }
-    console.log(`Successfully saved quiz score for FID ${userFid}.`);
-
-    // --- LOGIKA QUEST DIMULAI DI SINI ---
     
-    // 4. Ambil detail quest dari DB
+    await supabase.from('weekly_quiz_scores').insert({
+      user_fid: userFid, username: username, pfp_url: pfpUrl, score: score, week_identifier: weekIdentifier,
+    }).throwOnError();
+    console.log(`[FID: ${userFid}] Successfully saved to weekly_quiz_scores.`);
+
     const { data: quest, error: questError } = await supabase
       .from('quests')
-      .select('id, points, is_recurring')
+      .select('id, points')
       .eq('verification_logic', 'complete_weekly_quiz')
       .single();
 
     if (questError || !quest) {
-      console.warn('Could not find "complete_weekly_quiz" quest. Skipping quest logic.');
-      return NextResponse.json({ message: 'Score saved, but quest not found.', score });
+      console.error(`[FID: ${userFid}] CRITICAL: Quest 'complete_weekly_quiz' not found. Points not awarded.`);
+      return NextResponse.json({ message: 'Score saved, but quest was not found.', score });
     }
+    console.log(`[FID: ${userFid}] Found quest ID: ${quest.id} with ${quest.points} points.`);
 
-    // 5. Cek apakah quest ini sudah diselesaikan minggu ini
     const today = new Date();
-    // Mendapatkan hari Senin di minggu ini
-    const firstDayOfWeek = new Date(today.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1)));
+    const dayOfWeek = today.getDay();
+    const firstDayOfWeek = new Date(today.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1)));
     firstDayOfWeek.setHours(0, 0, 0, 0);
 
-    const { data: existingCompletion, error: checkError } = await supabase
+    const { data: existingCompletion } = await supabase
       .from('user_quest_completions')
       .select('id', { count: 'exact' })
       .eq('user_fid', userFid)
       .eq('quest_id', quest.id)
       .gte('completed_at', firstDayOfWeek.toISOString());
 
-    if (checkError) {
-      console.error(`Error checking quest completion for FID ${userFid}:`, checkError);
-      // Lanjutkan saja, lebih baik poin tidak masuk daripada user dapat error
-    } else if (existingCompletion && existingCompletion.length > 0) {
-      console.log(`FID ${userFid} has already completed the weekly quiz quest this week.`);
+    if (existingCompletion && existingCompletion.length > 0) {
+      console.log(`[FID: ${userFid}] Quest already completed this week.`);
     } else {
-      // 6. Jika belum, berikan poin dan tandai selesai
-      console.log(`Awarding ${quest.points} points to FID ${userFid} for quest ID ${quest.id}.`);
+      console.log(`[FID: ${userFid}] Awarding points...`);
+      await supabase.from('user_quest_completions').insert({ 
+          user_fid: userFid, quest_id: quest.id 
+      }).throwOnError();
       
-      const { error: completionInsertError } = await supabase
-        .from('user_quest_completions')
-        .insert({ user_fid: userFid, quest_id: quest.id });
-
-      if (completionInsertError) {
-        console.error(`Error inserting quest completion for FID ${userFid}:`, completionInsertError);
-      } else {
-        const { error: rpcError } = await supabase.rpc('add_user_points', {
-          p_user_fid: userFid,
-          p_points_to_add: quest.points,
-        });
-
-        if (rpcError) {
-          console.error(`Error calling RPC add_user_points for FID ${userFid}:`, rpcError);
-        } else {
-          console.log(`Successfully awarded points to FID ${userFid}.`);
-        }
-      }
+      const { error: rpcError } = await supabase.rpc('add_user_points', {
+        p_user_fid: userFid,
+        p_points_to_add: quest.points,
+      });
+      
+      if (rpcError) throw rpcError;
+      console.log(`[FID: ${userFid}] Successfully awarded points.`);
     }
 
     return NextResponse.json({ message: 'Score and quest progress saved!', score });
 
   } catch (error) {
-    console.error('Critical error in /api/quiz/submit-score:', error);
+    console.error(`[API /api/quiz/submit-score] CRITICAL ERROR:`, error);
     const errorMessage = error instanceof Error ? error.message : 'An unknown server error occurred.';
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
