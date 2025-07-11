@@ -16,8 +16,8 @@ export async function POST(req: NextRequest) {
     return new NextResponse('Server configuration error', { status: 500 });
   }
 
-  // Tentukan URL tujuan lengkap untuk Mini App Anda
-  const destinationUrl = `${appUrl}/app`;
+  // ==== PERUBAHAN DI SINI: URL tujuan diubah ke halaman root ====
+  const destinationUrl = `${appUrl}/`;
 
   // Kembalikan respons HTTP 302 dengan header 'Location'
   // Ini akan memberitahu klien Farcaster untuk mengalihkan pengguna.
@@ -31,7 +31,8 @@ export async function GET(req: NextRequest) {
     if (!appUrl) {
        return new NextResponse('Server configuration error', { status: 500 });
     }
-    const destinationUrl = `${appUrl}/app`;
+    // ==== PERUBAHAN DI SINI: URL tujuan diubah ke halaman root ====
+    const destinationUrl = `${appUrl}/`;
     // Alihkan pengguna yang tersesat langsung ke aplikasi
     return NextResponse.redirect(destinationUrl, 302);
 }
