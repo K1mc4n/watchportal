@@ -85,10 +85,10 @@ export default function Demo({ title }: { title?: string }) {
       <div className="mx-auto py-2 px-4 pb-20">
         <Header />
         
-        {/* GAMBAR HEADER YANG SUDAH DIPERBESAR */}
+        {/* GAMBAR HEADER DENGAN NAMA FILE YANG BENAR */}
         <div className="flex justify-center mb-4 px-2">
           <Image
-            src="/og-image.png" 
+            src="/Midlogo.png" // <- NAMA FILE DIGANTI DI SINI
             alt="Watch Portal"
             width={800} 
             height={260} 
@@ -169,4 +169,4 @@ export default function Demo({ title }: { title?: string }) {
       <Footer />
     </div>
   );
-}
+        }
