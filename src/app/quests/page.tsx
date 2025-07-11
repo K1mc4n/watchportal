@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState, useCallback } from 'react'; // 1. Impor useCallback
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useMiniApp } from '@neynar/react';
 import { Header } from '~/components/ui/Header';
@@ -25,7 +25,7 @@ interface Completion {
 }
 
 export default function QuestsPage() {
-  const { context } = useMiniApp();
+  const { context, actions } = useMiniApp(); // 1. Ambil `actions` dari useMiniApp
   const userFid = context?.user?.fid;
 
   const [quests, setQuests] = useState<Quest[]>([]);
@@ -33,7 +33,6 @@ export default function QuestsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [verifyingQuestId, setVerifyingQuestId] = useState<number | null>(null);
 
-  // 2. Bungkus fungsi fetch dengan useCallback
   const fetchQuestData = useCallback(async () => {
       setIsLoading(true);
       try {
@@ -51,12 +50,52 @@ export default function QuestsPage() {
       } finally {
         setIsLoading(false);
       }
-  }, [userFid]); // Tambahkan userFid sebagai dependensi useCallback
+  }, [userFid]);
 
-  // 3. Tambahkan fetchQuestData ke dependensi useEffect
   useEffect(() => {
     fetchQuestData();
   }, [fetchQuestData]);
+  
+  // 2. Buat fungsi baru untuk handle "Share"
+  const handleShareAndVerify = async (quest: Quest) => {
+    if (!userFid || !actions?.composeCast) {
+        alert("Please login and open in a Farcaster client to share.");
+        return;
+    }
+
+    const urlToShare = quest.verification_logic.split(':')[1];
+    
+    // Buka dialog untuk membuat cast
+    await actions.composeCast({
+      text: "Discover awesome Farcaster mini-apps on Watch Portal!",
+      embeds: [urlToShare],
+    });
+
+    // Setelah dialog ditutup, langsung coba verifikasi quest-nya.
+    // Ini berdasarkan kepercayaan, karena kita tidak bisa tahu apakah user benar-benar nge-cast.
+    setVerifyingQuestId(quest.id);
+    try {
+      const response = await fetch('/api/quests/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questId: quest.id, userFid }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert(result.message || "Quest completed! 🎉 Thank you for sharing!");
+        await fetchQuestData(); // Refresh data
+      } else {
+        // Ini mungkin terjadi jika quest tidak berulang dan sudah diselesaikan
+        alert(result.message || "Could not complete quest.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setVerifyingQuestId(null);
+    }
+  };
+
 
   const handleVerify = async (questId: number) => {
     if (!userFid) {
@@ -73,7 +112,7 @@ export default function QuestsPage() {
       const result = await response.json();
       if (result.success) {
         alert(result.message || "Quest completed! 🎉");
-        await fetchQuestData(); // Refresh data untuk update UI
+        await fetchQuestData(); // Refresh data
       } else {
         alert(`Verification failed: ${result.message || 'Please ensure you have completed the task.'}`);
       }
@@ -84,7 +123,6 @@ export default function QuestsPage() {
       setVerifyingQuestId(null);
     }
   };
-
 
   const isQuestCompleted = (quest: Quest): boolean => {
     const completion = completions.find(c => c.quest_id === quest.id);
@@ -106,6 +144,15 @@ export default function QuestsPage() {
         </Link>
       );
     }
+
+    // 3. Tambahkan logika render untuk quest "Share"
+    if (quest.verification_logic.startsWith('share_link:')) {
+        return (
+            <Button onClick={() => handleShareAndVerify(quest)} isLoading={isLoading}>
+                Share & Claim
+            </Button>
+        );
+    }
     
     if (
         quest.verification_logic.startsWith('follow_fid:') ||
@@ -122,6 +169,7 @@ export default function QuestsPage() {
     return <Button disabled>Start</Button>;
   };
 
+  // ... sisa komponen (tidak ada perubahan dari sini ke bawah) ...
   return (
     <div>
       <div className="mx-auto py-2 px-4 pb-20 max-w-2xl">
