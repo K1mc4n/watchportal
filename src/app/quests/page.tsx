@@ -1,73 +1,79 @@
-// src/app/quests/page.tsx (Versi Final)
+// src/app/quests/page.tsx (Versi Final dengan Logika "Done" yang Benar)
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useMiniApp } from '@neynar/react'; // <-- Impor hook useMiniApp
+import { useMiniApp } from '@neynar/react';
 import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
 import { Button } from '~/components/ui/Button';
-import { LoaderCircle, CheckCircle } from 'lucide-react';
+import { LoaderCircle, CheckCircle, PartyPopper } from 'lucide-react';
 
 interface Quest {
   id: number;
   title: string;
   description: string;
   points: number;
-  // Tambahkan properti ini untuk logika verifikasi nanti
-  verification_logic: string; 
+  verification_logic: string;
+  is_recurring: boolean; // <-- Kita akan gunakan ini
+}
+
+// Tipe data baru untuk menyimpan data penyelesaian
+interface Completion {
+  quest_id: number;
+  completed_at: string;
 }
 
 export default function QuestsPage() {
-  const { context } = useMiniApp(); // <-- Gunakan hook untuk mendapatkan data pengguna
+  const { context } = useMiniApp();
   const userFid = context?.user?.fid;
 
   const [quests, setQuests] = useState<Quest[]>([]);
-  const [completedQuests, setCompletedQuests] = useState<Set<number>>(new Set());
+  // State sekarang menyimpan data penyelesaian yang lebih lengkap
+  const [completions, setCompletions] = useState<Completion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Gabungkan kedua fetch ke dalam satu fungsi
     const fetchQuestData = async () => {
       setIsLoading(true);
       try {
-        // Fetch semua quest yang aktif
         const questsResponse = await fetch('/api/quests/list');
         const questsData = await questsResponse.json();
         setQuests(questsData.quests || []);
 
-        // Jika pengguna sudah login, fetch quest yang sudah mereka selesaikan
         if (userFid) {
           const completedResponse = await fetch(`/api/user/completed-quests?fid=${userFid}`);
           const completedData = await completedResponse.json();
-          setCompletedQuests(new Set(completedData.completedQuestIds || []));
+          // Simpan data penyelesaian lengkap
+          setCompletions(completedData.completions || []);
         }
-
       } catch (error) {
         console.error("Failed to fetch quest data", error);
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchQuestData();
-  }, [userFid]); // <-- Jalankan ulang useEffect jika userFid berubah (misalnya setelah login)
+  }, [userFid]);
 
-  // Fungsi untuk menentukan tombol apa yang harus ditampilkan
+  // Fungsi untuk mengecek apakah sebuah quest sudah selesai
+  const isQuestCompleted = (quest: Quest): boolean => {
+    const completion = completions.find(c => c.quest_id === quest.id);
+    if (!completion) return false; // Belum pernah selesai
+
+    // Jika quest tidak bisa diulang, maka selalu dianggap selesai
+    if (!quest.is_recurring) return true;
+
+    // Jika bisa diulang (seperti kuis mingguan)
+    // Cek apakah sudah diselesaikan dalam 7 hari terakhir
+    const completionDate = new Date(completion.completed_at);
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    return completionDate > sevenDaysAgo;
+  };
+
   const renderQuestAction = (quest: Quest) => {
-    const isCompleted = completedQuests.has(quest.id);
-
-    if (isCompleted) {
-      return (
-        <div className="flex items-center gap-2 text-green-400 font-semibold px-4">
-          <CheckCircle size={20} />
-          <span>Done</span>
-        </div>
-      );
-    }
-    
-    // Logika untuk tombol "Start"
-    // Di masa depan, ini bisa menjadi lebih kompleks
+    // Tombol "Start" untuk kuis
     if (quest.verification_logic === 'complete_weekly_quiz') {
       return (
         <Link href="/quiz">
@@ -75,10 +81,10 @@ export default function QuestsPage() {
         </Link>
       );
     }
-    
-    // Tombol default untuk quest lain yang belum diimplementasikan
-    return <Button disabled>Coming Soon</Button>;
+    return <Button disabled>Start</Button>;
   };
+  
+  const questsToShow = quests; // Tampilkan semua quest aktif
 
   return (
     <div>
@@ -95,19 +101,38 @@ export default function QuestsPage() {
               <LoaderCircle className="animate-spin h-10 w-10 text-gold" />
             </div>
           ) : (
-            <div className="space-y-4">
-              {quests.map(quest => (
-                <div key={quest.id} className="bg-neutral-800 p-4 rounded-lg border border-neutral-700 flex items-center justify-between">
-                  <div>
-                    <h3 className="font-bold text-white">{quest.title}</h3>
-                    <p className="text-sm text-neutral-400 mt-1">{quest.description}</p>
-                    <p className="text-sm font-bold text-gold mt-2">{quest.points} Points</p>
-                  </div>
-                  {/* Panggil fungsi render aksi */}
-                  {renderQuestAction(quest)}
-                </div>
-              ))}
-            </div>
+            questsToShow.length > 0 ? (
+              <div className="space-y-4">
+                {questsToShow.map(quest => {
+                  const completed = isQuestCompleted(quest);
+                  return (
+                    <div key={quest.id} className={`bg-neutral-800 p-4 rounded-lg border border-neutral-700 flex items-center justify-between transition-opacity ${completed ? 'opacity-60' : ''}`}>
+                      <div>
+                        <h3 className="font-bold text-white">{quest.title}</h3>
+                        <p className="text-sm text-neutral-400 mt-1">{quest.description}</p>
+                        <p className="text-sm font-bold text-gold mt-2">{quest.points} Points</p>
+                      </div>
+                      {completed ? (
+                        <div className="flex items-center gap-2 text-green-400 font-semibold px-4">
+                          <CheckCircle size={20} />
+                          <span>Done</span>
+                        </div>
+                      ) : (
+                        renderQuestAction(quest)
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-10 px-4 bg-neutral-800 rounded-lg">
+                <PartyPopper className="mx-auto h-12 w-12 text-gold" />
+                <h3 className="mt-4 text-xl font-bold text-white">No Quests Available</h3>
+                <p className="mt-2 text-neutral-400">
+                  Check back soon for new challenges!
+                </p>
+              </div>
+            )
           )}
         </div>
       </div>
