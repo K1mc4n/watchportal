@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react'; // 1. Impor useCallback
 import Link from 'next/link';
 import { useMiniApp } from '@neynar/react';
 import { Header } from '~/components/ui/Header';
@@ -33,7 +33,8 @@ export default function QuestsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [verifyingQuestId, setVerifyingQuestId] = useState<number | null>(null);
 
-  const fetchQuestData = async () => {
+  // 2. Bungkus fungsi fetch dengan useCallback
+  const fetchQuestData = useCallback(async () => {
       setIsLoading(true);
       try {
         const questsResponse = await fetch('/api/quests/list');
@@ -50,11 +51,12 @@ export default function QuestsPage() {
       } finally {
         setIsLoading(false);
       }
-  };
+  }, [userFid]); // Tambahkan userFid sebagai dependensi useCallback
 
+  // 3. Tambahkan fetchQuestData ke dependensi useEffect
   useEffect(() => {
     fetchQuestData();
-  }, [userFid]);
+  }, [fetchQuestData]);
 
   const handleVerify = async (questId: number) => {
     if (!userFid) {
@@ -105,7 +107,6 @@ export default function QuestsPage() {
       );
     }
     
-    // Kelompokkan semua quest yang bisa diverifikasi secara manual
     if (
         quest.verification_logic.startsWith('follow_fid:') ||
         quest.verification_logic.startsWith('hold_token:') ||
@@ -118,7 +119,6 @@ export default function QuestsPage() {
       );
     }
     
-    // Fallback untuk quest yang belum terdefinisi
     return <Button disabled>Start</Button>;
   };
 
