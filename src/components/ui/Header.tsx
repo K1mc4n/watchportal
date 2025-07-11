@@ -1,3 +1,4 @@
+// src/components/ui/Header.tsx
 "use client";
 
 import { useState } from "react";
@@ -19,7 +20,7 @@ export function Header() {
 
   const LoadingOrLoggedOutState = () => (
     <div className="flex h-16 items-center justify-between px-2">
-      <div className="w-10 h-10" />
+      <div className="w-10 h-10" /> {/* Placeholder untuk keseimbangan layout */}
       <div className="w-10 h-10 rounded-full bg-neutral-700 animate-pulse"></div>
     </div>
   );
@@ -27,18 +28,21 @@ export function Header() {
   const LoggedInState = () => (
     <div className="relative mb-2">
       <div className="flex h-16 items-center justify-between px-2">
+        {/* BLOK LOGO DI SEBELAH KIRI */}
         <Link href="/app" className="flex items-center gap-2">
           <Image
-            src="/Midlogo.png" 
+            src="/Midlogo.png" // Path ke logo Anda di folder /public
             alt="Watch Portal Logo"
             width={36}
             height={36}
             className="rounded-md"
-            priority // Memberitahu Next.js untuk memuat gambar ini lebih awal
+            priority // Membantu Next.js memuat gambar ini lebih cepat
+            unoptimized={true} // <-- Ini seringkali menjadi kunci perbaikan jika Image component bermasalah
           />
           <span className="font-bold text-lg hidden sm:inline text-gold">Watch Portal</span>
         </Link>
         
+        {/* BLOK PROFIL PENGGUNA DI SEBELAH KANAN */}
         <div className="relative">
           <div 
             className="cursor-pointer"
