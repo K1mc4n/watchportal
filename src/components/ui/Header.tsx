@@ -1,9 +1,10 @@
-// src/components/ui/Header.tsx (Perbaikan Final)
+// src/components/ui/Header.tsx (Versi Baru)
 "use client";
 
 import { useState } from "react";
 import { useMiniApp } from "@neynar/react";
 import Image from 'next/image';
+import Link from 'next/link'; // <-- Impor komponen Link
 
 export function Header() {
   const { context, actions } = useMiniApp();
@@ -17,15 +18,32 @@ export function Header() {
     }
   };
 
+  // State saat loading atau logout, sekarang dengan layout yang seimbang
   const LoadingOrLoggedOutState = () => (
-    <div className="flex h-16 items-center justify-end px-2">
+    <div className="flex h-16 items-center justify-between px-2">
+      <div className="w-10 h-10" /> {/* Placeholder untuk logo agar layout tidak bergeser */}
       <div className="w-10 h-10 rounded-full bg-neutral-700 animate-pulse"></div>
     </div>
   );
 
+  // State saat sudah login
   const LoggedInState = () => (
     <div className="relative mb-2">
-      <div className="flex h-16 items-center justify-end px-2">
+      {/* UBAH BARIS INI: Gunakan justify-between untuk memisahkan item */}
+      <div className="flex h-16 items-center justify-between px-2">
+        {/* TAMBAHKAN BLOK INI: Logo di sebelah kiri */}
+        <Link href="/app" className="flex items-center gap-2">
+          <Image
+            src="/watchcoin-logo.png" // Menggunakan logo yang lebih kecil
+            alt="Watch Portal Logo"
+            width={36}
+            height={36}
+            className="rounded-md"
+          />
+          <span className="font-bold text-lg hidden sm:inline text-gold">Watch Portal</span>
+        </Link>
+        
+        {/* Kode profil pengguna yang sudah ada sebelumnya */}
         <div className="relative">
           <div 
             className="cursor-pointer"
@@ -42,7 +60,6 @@ export function Header() {
               />
             ) : (
               <div className="w-10 h-10 rounded-full border-2 border-gold bg-neutral-700 flex items-center justify-center text-white font-bold">
-                {/* --- PERBAIKAN DI SINI --- */}
                 {loggedInUser?.username?.charAt(0).toUpperCase()}
               </div>
             )}
@@ -55,10 +72,8 @@ export function Header() {
                   className="font-bold text-sm hover:underline cursor-pointer"
                   onClick={handleViewProfile}
                 >
-                  {/* --- DAN DI SINI --- */}
                   {loggedInUser?.displayName || loggedInUser?.username}
                 </h3>
-                {/* --- DAN DI SINI --- */}
                 <p className="text-xs text-gray-400">@{loggedInUser?.username}</p>
               </div>
             </div>
