@@ -1,9 +1,9 @@
-// src/components/ui/Footer.tsx (Versi yang Diperbarui)
+// src/components/ui/Footer.tsx (Versi Akhir dengan 6 Tombol)
 'use client';
 
 import { useState } from 'react';
-// Impor ikon baru untuk kuis
-import { Home, Newspaper, PlusSquare, MessageCircle, Swords, type LucideIcon } from 'lucide-react';
+// 1. Tambahkan ikon Trophy
+import { Home, Newspaper, PlusSquare, MessageCircle, Swords, Trophy, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChatWindow } from '~/components/ui/ChatWindow';
@@ -33,12 +33,13 @@ export function Footer() {
   const handleToggleChat = () => setIsChatOpen(!isChatOpen);
   const handleCloseChat = () => setIsChatOpen(false);
 
-  // Tambahkan 'quiz' ke tipe tab
-  const getActiveTab = (): 'home' | 'news' | 'submit' | 'quiz' | 'chat' | null => {
+  // 3. Perbarui logika getActiveTab untuk menangani semua 6 kondisi
+  const getActiveTab = (): 'home' | 'news' | 'submit' | 'quiz' | 'leaderboard' | 'chat' | null => {
     if (isChatOpen) return 'chat';
+    if (pathname.startsWith('/leaderboard')) return 'leaderboard'; // Cek leaderboard dulu
+    if (pathname.startsWith('/quiz')) return 'quiz';
     if (pathname.startsWith('/news')) return 'news';
     if (pathname.startsWith('/submit')) return 'submit';
-    if (pathname.startsWith('/quiz') || pathname.startsWith('/leaderboard')) return 'quiz'; // <- BARU
     if (pathname.startsWith('/app')) return 'home';
     return null;
   };
@@ -50,14 +51,15 @@ export function Footer() {
       {isChatOpen && <ChatWindow onClose={handleCloseChat} />}
 
       <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-700 shadow-lg">
-        {/* Sekarang 5 kolom */}
+        {/* Sekarang 6 kolom */}
         <div className="flex justify-around max-w-lg mx-auto px-1">
           <NavItem href="/app" icon={Home} label="Home" isActive={activeTab === 'home'} />
           <NavItem href="/news" icon={Newspaper} label="News" isActive={activeTab === 'news'} />
-          
-          {/* TOMBOL KUIS BARU DI TENGAH */}
           <NavItem href="/quiz" icon={Swords} label="Challenge" isActive={activeTab === 'quiz'} />
-
+          
+          {/* 2. TAMBAHKAN TOMBOL BARU UNTUK LEADERBOARD */}
+          <NavItem href="/leaderboard" icon={Trophy} label="Leaders" isActive={activeTab === 'leaderboard'} />
+          
           <NavItem href="/submit" icon={PlusSquare} label="Submit" isActive={activeTab === 'submit'} />
           <ChatButton onClick={handleToggleChat} isActive={activeTab === 'chat'} />
         </div>
