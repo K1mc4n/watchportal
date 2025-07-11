@@ -1,11 +1,11 @@
-// src/components/ui/Header.tsx (Versi dengan Tombol "Buy Watch")
+// src/components/ui/Header.tsx (Mengganti logo kiri)
 "use client";
 
 import { useState } from "react";
 import { useMiniApp } from "@neynar/react";
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button } from './Button'; // <-- Impor komponen Button
+import { Button } from './Button'; 
 
 export function Header() {
   const { context, actions } = useMiniApp();
@@ -19,14 +19,11 @@ export function Header() {
     }
   };
   
-  // --- Fungsi untuk membuka link eksternal ---
   const handleBuyLink = () => {
     const buyUrl = 'https://streme.fun/token/0x2bb8fd57ac1e62194d56cd7680a067278c505e29';
     if (actions?.openUrl) {
-      // Gunakan SDK jika tersedia untuk pengalaman terbaik di dalam Mini App
       actions.openUrl(buyUrl);
     } else {
-      // Fallback untuk browser biasa
       window.open(buyUrl, '_blank', 'noopener,noreferrer');
     }
   };
@@ -36,10 +33,11 @@ export function Header() {
       <div className="flex h-16 items-center justify-between px-2 gap-2">
         {/* Kontainer untuk item di sebelah kiri */}
         <div className="flex items-center gap-3">
-          {/* Logo */}
+          {/* Logo aplikasi yang bisa diklik */}
           <Link href="/app" className="flex items-center">
+            {/* ==== PERUBAHAN ADA DI SINI ==== */}
             <Image
-              src="/Midlogo.png"
+              src="/watchcoin-logo.png" // Menggunakan logo watchcoin
               alt="Watch Portal Logo"
               width={36}
               height={36}
@@ -48,11 +46,11 @@ export function Header() {
               unoptimized={true}
             />
           </Link>
-          {/* TOMBOL "BUY WATCH" YANG BARU */}
+          {/* Tombol "Buy Watch" */}
           <Button 
             onClick={handleBuyLink}
-            variant="secondary" // Menggunakan varian 'secondary' agar tidak terlalu mencolok
-            size="sm" // Ukuran lebih kecil agar pas di header
+            variant="secondary"
+            size="sm"
           >
             Buy Watch
           </Button>
