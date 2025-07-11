@@ -86,10 +86,20 @@ export default function Demo({ title }: { title?: string }) {
       <div className="mx-auto py-2 px-4 pb-20">
         <Header />
         
-        {/* LOGO DI TENGAH SUDAH DIHAPUS DARI SINI */}
+        {/* GAMBAR HEADER DENGAN NAMA FILE YANG BENAR */}
+        <div className="flex justify-center mb-4 px-2">
+          <Image
+            src="/Midlogo.png" // <- NAMA FILE DIGANTI DI SINI
+            alt="Watch Portal"
+            width={800} 
+            height={260} 
+            priority
+            className="w-full max-w-xl object-contain"
+          />
+        </div>
         
         {/* Search Input */}
-        <div className="px-2 mb-6 mt-4">
+        <div className="px-2 mb-6">
           <input
             type="text"
             value={searchTerm}
