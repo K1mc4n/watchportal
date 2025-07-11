@@ -1,66 +1,97 @@
-// Lokasi file: src/lib/viem.ts
+// src/lib/viem.ts
 
-import { createPublicClient, http, parseUnits, type Address } from 'viem';
-import { base } from 'wagmi/chains'; // Kita fokus pada chain Base untuk quest ini
+import { createPublicClient, http, parseUnits, type Address, type Chain } from 'viem';
+// 1. Impor semua chain yang kita dukung
+import { base, optimism, degen, arbitrum, mainnet } from 'wagmi/chains';
 
-// ABI (Application Binary Interface) minimal yang kita butuhkan untuk cek saldo.
+// --- BAGIAN BARU: Pemetaan Chain dan RPC ---
+// 2. Buat pemetaan dari nama string ke objek chain dari viem
+const chainMap: Record<string, Chain> = {
+  Base: base,
+  Optimism: optimism,
+  Degen: degen,
+  Arbitrum: arbitrum,
+  'Multi-chain': mainnet, // Asumsikan multi-chain bisa dicek di mainnet atau base
+  Other: mainnet, // Fallback ke mainnet untuk 'Other'
+};
+
+// 3. Fungsi untuk mendapatkan klien viem yang benar berdasarkan nama chain
+const getViemClient = (chainName: string) => {
+  const chain = chainMap[chainName];
+  if (!chain) {
+    throw new Error(`Unsupported chain for verification: ${chainName}`);
+  }
+  
+  // Anda bisa menambahkan RPC URL spesifik per chain jika punya
+  // contoh: const rpcUrl = process.env[`${chainName.toUpperCase()}_RPC_URL`];
+  return createPublicClient({
+    chain: chain,
+    transport: http(), // Menggunakan RPC publik default dari viem
+  });
+};
+// --- AKHIR BAGIAN BARU ---
+
+
 const erc20Abi = [{ type: 'function', name: 'balanceOf', inputs: [{ name: 'owner', type: 'address' }], outputs: [{ name: 'balance', type: 'uint256' }], stateMutability: 'view' }] as const;
 const erc721Abi = [{ type: 'function', name: 'balanceOf', inputs: [{ name: 'owner', type: 'address' }], outputs: [{ name: 'balance', type: 'uint256' }], stateMutability: 'view' }] as const;
 
-// Inisialisasi klien publik untuk berkomunikasi dengan blockchain Base.
-// process.env.BASE_RPC_URL adalah opsional, viem akan menggunakan RPC publik jika tidak ada.
-const publicClient = createPublicClient({
-  chain: base,
-  transport: http(process.env.BASE_RPC_URL),
-});
 
 /**
- * Memeriksa apakah sebuah alamat memiliki saldo token ERC20 yang cukup.
+ * Memeriksa saldo token ERC20 di chain yang benar.
+ * @param chainName Nama chain tempat token berada (cth: "Base", "Optimism").
  * @param userAddress Alamat wallet pengguna.
  * @param tokenContract Alamat kontrak token.
- * @param minAmount Jumlah minimal yang harus dimiliki (sebagai string, cth: "1000").
+ * @param minAmount Jumlah minimal yang harus dimiliki (sebagai string).
  * @param decimals Jumlah desimal token.
- * @returns true jika saldo mencukupi, false jika tidak.
+ * @returns true jika saldo mencukupi.
  */
-export async function checkTokenBalance(userAddress: Address, tokenContract: Address, minAmount: string, decimals: number): Promise<boolean> {
+// 4. Tambahkan parameter `chainName`
+export async function checkTokenBalance(chainName: string, userAddress: Address, tokenContract: Address, minAmount: string, decimals: number): Promise<boolean> {
   try {
-    const balance = await publicClient.readContract({
+    // 5. Dapatkan client untuk chain yang benar
+    const client = getViemClient(chainName);
+
+    const balance = await client.readContract({
       address: tokenContract,
       abi: erc20Abi,
       functionName: 'balanceOf',
       args: [userAddress],
     });
 
-    // Konversi jumlah minimal ke unit terkecil token (seperti wei untuk ETH)
     const requiredAmount = parseUnits(minAmount, decimals);
     
-    console.log(`[Viem] Checking token ${tokenContract} for ${userAddress}. Required: ${requiredAmount}, Has: ${balance}`);
+    console.log(`[Viem on ${chainName}] Checking token ${tokenContract} for ${userAddress}. Required: ${requiredAmount}, Has: ${balance}`);
     return balance >= requiredAmount;
   } catch (error) {
-    console.error(`[Viem] Error checking token balance for ${tokenContract}:`, error);
+    console.error(`[Viem on ${chainName}] Error checking token balance for ${tokenContract}:`, error);
     return false;
   }
 }
 
 /**
- * Memeriksa apakah sebuah alamat memiliki setidaknya satu NFT dari koleksi tertentu.
+ * Memeriksa saldo NFT di chain yang benar.
+ * @param chainName Nama chain tempat NFT berada.
  * @param userAddress Alamat wallet pengguna.
  * @param nftContract Alamat kontrak NFT.
- * @returns true jika memiliki > 0 NFT, false jika tidak.
+ * @returns true jika memiliki > 0 NFT.
  */
-export async function checkNftBalance(userAddress: Address, nftContract: Address): Promise<boolean> {
+// 6. Tambahkan parameter `chainName`
+export async function checkNftBalance(chainName: string, userAddress: Address, nftContract: Address): Promise<boolean> {
   try {
-    const balance = await publicClient.readContract({
+    // 7. Dapatkan client untuk chain yang benar
+    const client = getViemClient(chainName);
+
+    const balance = await client.readContract({
       address: nftContract,
       abi: erc721Abi,
       functionName: 'balanceOf',
       args: [userAddress],
     });
 
-    console.log(`[Viem] Checking NFT ${nftContract} for ${userAddress}. Has: ${balance}`);
+    console.log(`[Viem on ${chainName}] Checking NFT ${nftContract} for ${userAddress}. Has: ${balance}`);
     return balance > 0;
   } catch (error) {
-    console.error(`[Viem] Error checking NFT balance for ${nftContract}:`, error);
+    console.error(`[Viem on ${chainName}] Error checking NFT balance for ${nftContract}:`, error);
     return false;
   }
 }
