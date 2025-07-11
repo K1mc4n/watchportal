@@ -3,7 +3,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '~/lib/supabase';
 
-// Jangan cache endpoint ini, karena status penyelesaian pengguna harus selalu terbaru.
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
@@ -15,22 +14,18 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    // Ambil hanya ID dari quest yang sudah diselesaikan oleh pengguna ini.
-    // Ini lebih efisien daripada mengambil seluruh baris data.
+    // Ambil quest_id DAN completed_at
     const { data, error } = await supabase
       .from('user_quest_completions')
-      .select('quest_id')
+      .select('quest_id, completed_at') // <-- AMBIL KEDUA KOLOM
       .eq('user_fid', userFid);
 
     if (error) {
       throw error;
     }
 
-    // Ubah array objek [{ quest_id: 1 }, { quest_id: 3 }]
-    // menjadi Set yang lebih mudah dicari: Set(1, 3)
-    const completedQuestIds = new Set(data.map(item => item.quest_id));
-
-    return NextResponse.json({ completedQuestIds: Array.from(completedQuestIds) });
+    // Kirim seluruh array objek ke frontend
+    return NextResponse.json({ completions: data || [] });
 
   } catch (err) {
     console.error('Error fetching completed quests:', err);
