@@ -1,4 +1,3 @@
-// src/components/ui/Header.tsx (Versi Baru dengan Logo yang Benar)
 "use client";
 
 import { useState } from "react";
@@ -28,20 +27,18 @@ export function Header() {
   const LoggedInState = () => (
     <div className="relative mb-2">
       <div className="flex h-16 items-center justify-between px-2">
-        {/* Logo di sebelah kiri */}
         <Link href="/app" className="flex items-center gap-2">
-          {/* ==== PERUBAHAN DI SINI ==== */}
           <Image
-            src="/Midlogo.png" // Menggunakan path yang Anda berikan
+            src="/Midlogo.png" 
             alt="Watch Portal Logo"
             width={36}
             height={36}
             className="rounded-md"
+            priority // Memberitahu Next.js untuk memuat gambar ini lebih awal
           />
           <span className="font-bold text-lg hidden sm:inline text-gold">Watch Portal</span>
         </Link>
         
-        {/* Kode profil pengguna */}
         <div className="relative">
           <div 
             className="cursor-pointer"
