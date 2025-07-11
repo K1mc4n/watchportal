@@ -1,30 +1,35 @@
-// src/components/ui/Share.tsx
+// src/components/ui/Share.tsx (Versi yang Diperbarui)
 
 'use client';
 
 import { useCallback, useState } from 'react';
-import { Button } from './Button';
+// 1. Impor ButtonProps dan buttonVariants untuk mendapatkan semua prop yang valid
+import { Button, type ButtonProps } from './Button'; 
 import { useMiniApp } from '@neynar/react';
 import { type ComposeCast } from "@farcaster/frame-sdk";
 
-// Definisikan tipe cast config yang lebih sederhana dan sesuai
 interface CastConfig {
   text: string;
-  // Embeds sekarang adalah array of strings, sesuai permintaan SDK
   embeds?: [string] | [string, string]; 
   parent?: ComposeCast.Options['parent'];
   channelKey?: string;
   close?: boolean;
 }
 
-interface ShareButtonProps {
+// 2. Gabungkan props custom dengan ButtonProps
+interface ShareButtonProps extends ButtonProps {
   buttonText: string;
   cast: CastConfig;
-  className?: string;
-  isLoading?: boolean;
 }
 
-export function ShareButton({ buttonText, cast, className = '', isLoading = false }: ShareButtonProps) {
+export function ShareButton({ 
+  buttonText, 
+  cast, 
+  className = '', 
+  isLoading = false, 
+  // 3. Terima semua prop Button lainnya (seperti variant, size, dll.)
+  ...props 
+}: ShareButtonProps) {
   const { actions } = useMiniApp();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -37,10 +42,7 @@ export function ShareButton({ buttonText, cast, className = '', isLoading = fals
 
     try {
       setIsProcessing(true);
-      
-      // Kita langsung teruskan 'cast' karena tipenya sudah benar
       await actions.composeCast(cast);
-
     } catch (error) {
       console.error('Failed to share:', error);
     } finally {
@@ -53,6 +55,8 @@ export function ShareButton({ buttonText, cast, className = '', isLoading = fals
       onClick={handleShare}
       className={className}
       isLoading={isLoading || isProcessing}
+      // 4. Teruskan semua prop tambahan ke komponen Button
+      {...props} 
     >
       {buttonText}
     </Button>
