@@ -34,7 +34,7 @@ export function Header() {
         {/* Kontainer untuk item di sebelah kiri */}
         <div className="flex items-center gap-3">
           {/* Logo aplikasi yang bisa diklik */}
-          <Link href="/app" className="flex items-center">
+          <Link href="/" className="flex items-center">
             {/* ==== PERUBAHAN ADA DI SINI ==== */}
             <Image
               src="/watchcoin-logo.png" // Menggunakan logo watchcoin
