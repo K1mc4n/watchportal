@@ -125,7 +125,7 @@ export default function QuizPage() {
     // == PERUBAHAN ADA DI SINI ==
     // =======================================================
     const castConfig = {
-      text: `I just scored ${finalScore}/${weeklyQuestions.length} on the Weekly $SECONDS Challenge! Earn Up $100 Every Week! Can you beat my score?\n\nTake the quiz on @Watchcoin 👇\nhttps://watchportal.vercel.app/`,
+      text: `I just scored ${finalScore}/${weeklyQuestions.length} on the Weekly $SECONDS Challenge! Earn Up $100 Every Week! Can you beat my score?\n\nTake the quiz on Watch Portal👇\nhttps://watchportal.vercel.app/`,
       embeds: ['https://watchportal.vercel.app/'] as [string],
     };
     // =======================================================
