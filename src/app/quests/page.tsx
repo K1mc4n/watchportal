@@ -25,7 +25,7 @@ interface Completion {
 }
 
 export default function QuestsPage() {
-  const { context, actions } = useMiniApp(); // 1. Ambil `actions` dari useMiniApp
+  const { context, actions } = useMiniApp();
   const userFid = context?.user?.fid;
 
   const [quests, setQuests] = useState<Quest[]>([]);
@@ -56,23 +56,29 @@ export default function QuestsPage() {
     fetchQuestData();
   }, [fetchQuestData]);
   
-  // 2. Buat fungsi baru untuk handle "Share"
   const handleShareAndVerify = async (quest: Quest) => {
     if (!userFid || !actions?.composeCast) {
         alert("Please login and open in a Farcaster client to share.");
         return;
     }
 
-    const urlToShare = quest.verification_logic.split(':')[1];
+    // ==== PERBAIKAN LOGIKA DI SINI ====
+    // Ambil semua bagian setelah "share_link:"
+    const prefix = 'share_link:';
+    const urlToShare = quest.verification_logic.startsWith(prefix) 
+      ? quest.verification_logic.substring(prefix.length)
+      : '';
     
-    // Buka dialog untuk membuat cast
+    if (!urlToShare) {
+        alert("Invalid share link configured for this quest.");
+        return;
+    }
+
     await actions.composeCast({
       text: "Discover awesome Farcaster mini-apps on Watch Portal!",
       embeds: [urlToShare],
     });
 
-    // Setelah dialog ditutup, langsung coba verifikasi quest-nya.
-    // Ini berdasarkan kepercayaan, karena kita tidak bisa tahu apakah user benar-benar nge-cast.
     setVerifyingQuestId(quest.id);
     try {
       const response = await fetch('/api/quests/verify', {
@@ -83,9 +89,8 @@ export default function QuestsPage() {
       const result = await response.json();
       if (result.success) {
         alert(result.message || "Quest completed! 🎉 Thank you for sharing!");
-        await fetchQuestData(); // Refresh data
+        await fetchQuestData();
       } else {
-        // Ini mungkin terjadi jika quest tidak berulang dan sudah diselesaikan
         alert(result.message || "Could not complete quest.");
       }
     } catch (error) {
@@ -112,7 +117,7 @@ export default function QuestsPage() {
       const result = await response.json();
       if (result.success) {
         alert(result.message || "Quest completed! 🎉");
-        await fetchQuestData(); // Refresh data
+        await fetchQuestData();
       } else {
         alert(`Verification failed: ${result.message || 'Please ensure you have completed the task.'}`);
       }
@@ -145,7 +150,6 @@ export default function QuestsPage() {
       );
     }
 
-    // 3. Tambahkan logika render untuk quest "Share"
     if (quest.verification_logic.startsWith('share_link:')) {
         return (
             <Button onClick={() => handleShareAndVerify(quest)} isLoading={isLoading}>
@@ -169,7 +173,6 @@ export default function QuestsPage() {
     return <Button disabled>Start</Button>;
   };
 
-  // ... sisa komponen (tidak ada perubahan dari sini ke bawah) ...
   return (
     <div>
       <div className="mx-auto py-2 px-4 pb-20 max-w-2xl">
