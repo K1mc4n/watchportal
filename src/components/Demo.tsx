@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { useMiniApp } from "@neynar/react";
 import { useDebounce } from 'use-debounce';
-import Image from 'next/image'; // <- Pastikan impor ini ada
+import Image from 'next/image';
 
 import { Header } from "~/components/ui/Header";
 import { Footer } from "~/components/ui/Footer";
@@ -85,14 +85,15 @@ export default function Demo({ title }: { title?: string }) {
       <div className="mx-auto py-2 px-4 pb-20">
         <Header />
         
-        {/* Teks judul dan deskripsi diganti dengan gambar */}
-        <div className="flex justify-center my-4">
+        {/* GAMBAR HEADER YANG SUDAH DIPERBESAR */}
+        <div className="flex justify-center mb-4 px-2">
           <Image
-            src="/Midlogo.png"
-            alt="Watch Portal Logo"
-            width={300}
-            height={80}
+            src="/og-image.png" 
+            alt="Watch Portal"
+            width={800} 
+            height={260} 
             priority
+            className="w-full max-w-xl object-contain"
           />
         </div>
         
