@@ -1,8 +1,9 @@
-// src/app/quests/page.tsx
+// src/app/quests/page.tsx (Versi Final)
 "use client";
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useMiniApp } from '@neynar/react'; // <-- Impor hook useMiniApp
 import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
 import { Button } from '~/components/ui/Button';
@@ -13,26 +14,71 @@ interface Quest {
   title: string;
   description: string;
   points: number;
+  // Tambahkan properti ini untuk logika verifikasi nanti
+  verification_logic: string; 
 }
 
 export default function QuestsPage() {
+  const { context } = useMiniApp(); // <-- Gunakan hook untuk mendapatkan data pengguna
+  const userFid = context?.user?.fid;
+
   const [quests, setQuests] = useState<Quest[]>([]);
+  const [completedQuests, setCompletedQuests] = useState<Set<number>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchQuests = async () => {
+    // Gabungkan kedua fetch ke dalam satu fungsi
+    const fetchQuestData = async () => {
+      setIsLoading(true);
       try {
-        const response = await fetch('/api/quests/list');
-        const data = await response.json();
-        setQuests(data.quests || []);
+        // Fetch semua quest yang aktif
+        const questsResponse = await fetch('/api/quests/list');
+        const questsData = await questsResponse.json();
+        setQuests(questsData.quests || []);
+
+        // Jika pengguna sudah login, fetch quest yang sudah mereka selesaikan
+        if (userFid) {
+          const completedResponse = await fetch(`/api/user/completed-quests?fid=${userFid}`);
+          const completedData = await completedResponse.json();
+          setCompletedQuests(new Set(completedData.completedQuestIds || []));
+        }
+
       } catch (error) {
-        console.error("Failed to fetch quests", error);
+        console.error("Failed to fetch quest data", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchQuests();
-  }, []);
+
+    fetchQuestData();
+  }, [userFid]); // <-- Jalankan ulang useEffect jika userFid berubah (misalnya setelah login)
+
+  // Fungsi untuk menentukan tombol apa yang harus ditampilkan
+  const renderQuestAction = (quest: Quest) => {
+    const isCompleted = completedQuests.has(quest.id);
+
+    if (isCompleted) {
+      return (
+        <div className="flex items-center gap-2 text-green-400 font-semibold px-4">
+          <CheckCircle size={20} />
+          <span>Done</span>
+        </div>
+      );
+    }
+    
+    // Logika untuk tombol "Start"
+    // Di masa depan, ini bisa menjadi lebih kompleks
+    if (quest.verification_logic === 'complete_weekly_quiz') {
+      return (
+        <Link href="/quiz">
+          <Button>Start</Button>
+        </Link>
+      );
+    }
+    
+    // Tombol default untuk quest lain yang belum diimplementasikan
+    return <Button disabled>Coming Soon</Button>;
+  };
 
   return (
     <div>
@@ -57,10 +103,8 @@ export default function QuestsPage() {
                     <p className="text-sm text-neutral-400 mt-1">{quest.description}</p>
                     <p className="text-sm font-bold text-gold mt-2">{quest.points} Points</p>
                   </div>
-                  {/* Kita akan menambahkan logika untuk 'isCompleted' nanti */}
-                  <Link href="/quiz">
-                    <Button>Start</Button>
-                  </Link>
+                  {/* Panggil fungsi render aksi */}
+                  {renderQuestAction(quest)}
                 </div>
               ))}
             </div>
