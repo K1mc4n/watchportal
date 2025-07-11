@@ -12,7 +12,6 @@ export async function POST(request: NextRequest) {
     if (!questId || !userFid) {
       return NextResponse.json({ success: false, message: 'Missing questId or userFid.' }, { status: 400 });
     }
-    console.log(`[Verify] Received request for FID: ${userFid}, Quest ID: ${questId}`);
 
     const { data: quest, error: questError } = await supabase
       .from('quests').select('*').eq('id', questId).single();
@@ -21,8 +20,8 @@ export async function POST(request: NextRequest) {
       console.error(`[Verify] Quest not found for ID: ${questId}. Error:`, questError);
       return NextResponse.json({ success: false, message: 'Quest not found.' }, { status: 404 });
     }
-    console.log(`[Verify] Found quest: "${quest.title}" on chain: ${quest.chain}`);
 
+    // Cek apakah quest sudah diselesaikan (jika tidak berulang)
     if (!quest.is_recurring) {
         const { data: existing } = await supabase.from('user_quest_completions')
             .select('id').eq('user_fid', userFid).eq('quest_id', questId).limit(1);
@@ -34,64 +33,61 @@ export async function POST(request: NextRequest) {
     let isCompleted = false;
     const neynar = getNeynarClient();
 
+    // --- LOGIKA VERIFIKASI UTAMA (DIPERBARUI) ---
     if (quest.verification_logic.startsWith('follow_fid:')) {
-      // ... (logika follow tetap sama, tidak perlu diubah) ...
       const targetFid = parseInt(quest.verification_logic.split(':')[1]);
-      if (isNaN(targetFid)) throw new Error('Invalid FID in verification_logic');
-      
       const { users } = await neynar.fetchBulkUsers({ fids: [userFid], viewerFid: targetFid });
-
-      if (users[0]?.viewer_context?.following) {
-        isCompleted = true;
-      } else {
-        return NextResponse.json({ success: false, message: `Verification failed: You are not following the target user.` });
-      }
-    } else if (quest.verification_logic.startsWith('hold_token:') || quest.verification_logic.startsWith('hold_nft:')) {
+      isCompleted = users[0]?.viewer_context?.following ?? false;
+      if (!isCompleted) return NextResponse.json({ success: false, message: `Verification failed: You are not following the target user.` });
+    
+    } else if (quest.verification_logic.startsWith('hold_')) {
       const { users } = await neynar.fetchBulkUsers({ fids: [userFid] });
-      // Coba semua verifications/custody addresses
       const wallets = users[0]?.verifications?.map(addr => addr as Address) ?? [];
       if (users[0]?.custody_address) {
         wallets.push(users[0].custody_address as Address);
       }
 
       if (wallets.length === 0) {
-        return NextResponse.json({ success: false, message: 'Could not find a verified wallet for your Farcaster account. Please add one to your profile.' });
+        return NextResponse.json({ success: false, message: 'Could not find a verified wallet for your Farcaster account.' });
       }
-      
+
       let balanceCheckPassed = false;
       for (const userWallet of wallets) {
+        let hasBalance = false;
         if (quest.verification_logic.startsWith('hold_token:')) {
-          const [_, contractAddress, minAmount, decimals] = quest.verification_logic.split(':');
-          // ==== PERUBAHAN DI SINI: Kirim `quest.chain` ke fungsi checker ====
-          const hasBalance = await checkTokenBalance(quest.chain, userWallet, contractAddress as Address, minAmount, parseInt(decimals));
-          if (hasBalance) {
-            balanceCheckPassed = true;
-            break; 
-          }
+          // ==== PERUBAHAN UTAMA DI SINI ====
+          // Parsing format baru: hold_token:Chain:Contract:Amount:Decimals
+          const parts = quest.verification_logic.split(':');
+          if (parts.length !== 5) throw new Error(`Invalid hold_token logic format: ${quest.verification_logic}`);
+          const [_, chainName, contractAddress, minAmount, decimals] = parts;
+          
+          hasBalance = await checkTokenBalance(chainName, userWallet, contractAddress as Address, minAmount, parseInt(decimals));
         
         } else if (quest.verification_logic.startsWith('hold_nft:')) {
-          const [_, contractAddress] = quest.verification_logic.split(':');
-          // ==== PERUBAHAN DI SINI: Kirim `quest.chain` ke fungsi checker ====
-          const hasBalance = await checkNftBalance(quest.chain, userWallet, contractAddress as Address);
-          if (hasBalance) {
-            balanceCheckPassed = true;
-            break; 
-          }
+          // Parsing format baru: hold_nft:Chain:Contract
+          const parts = quest.verification_logic.split(':');
+          if (parts.length !== 3) throw new Error(`Invalid hold_nft logic format: ${quest.verification_logic}`);
+          const [_, chainName, contractAddress] = parts;
+
+          hasBalance = await checkNftBalance(chainName, userWallet, contractAddress as Address);
+        }
+
+        if (hasBalance) {
+          balanceCheckPassed = true;
+          break; // Keluar dari loop jika sudah ditemukan saldo yang cukup di satu wallet
         }
       }
 
       isCompleted = balanceCheckPassed;
       if (!isCompleted) {
-          return NextResponse.json({ success: false, message: `Verification failed: You do not hold enough ${quest.title}.` });
+          return NextResponse.json({ success: false, message: `Verification failed: You do not hold the required asset.` });
       }
     }
 
+    // --- LOGIKA PEMBERIAN HADIAH (TETAP SAMA) ---
     if (isCompleted) {
-      console.log(`[Verify] Awarding points for FID: ${userFid}`);
-      
       await supabase.from('user_quest_completions').insert({ user_fid: userFid, quest_id: questId }).throwOnError();
       await supabase.rpc('add_user_points', { p_user_fid: userFid, p_points_to_add: quest.points }).throwOnError();
-
       return NextResponse.json({ success: true, message: `Quest "${quest.title}" completed! You earned ${quest.points} points.` });
     }
 
@@ -102,4 +98,4 @@ export async function POST(request: NextRequest) {
     const message = error instanceof Error ? error.message : "An unknown error occurred.";
     return NextResponse.json({ success: false, message }, { status: 500 });
   }
-}
+        }
