@@ -1,16 +1,16 @@
 // src/app/page.tsx
 
 import type { Metadata } from 'next';
-import dynamic from 'next/dynamic';
+// PERBAIKAN: Ganti nama impor 'dynamic' menjadi nama lain, misalnya 'dynamicImport'
+import dynamicImport from 'next/dynamic';
 import { APP_NAME, APP_DESCRIPTION, APP_OG_IMAGE_URL } from '~/lib/constants';
 import { getMiniAppEmbedMetadata } from '~/lib/utils';
 import AppLoading from '~/components/AppLoading';
 
-// Revalidasi dan dynamic export ini penting untuk halaman mini-app
-export const revalidate = 300; 
+export const revalidate = 300;
+// Konstanta ini harus tetap ada dan diekspor
 export const dynamic = 'force-dynamic';
 
-// Fungsi ini akan tetap membuat metadata untuk Farcaster Frame
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: APP_NAME,
@@ -26,14 +26,12 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Impor komponen <Demo> secara dinamis, sama seperti di halaman /app sebelumnya
-// Ini akan menampilkan komponen loading selagi konten utama disiapkan.
-const Demo = dynamic(() => import('~/components/Demo'), {
+// Gunakan nama baru 'dynamicImport' saat memanggil fungsi
+const Demo = dynamicImport(() => import('~/components/Demo'), {
   ssr: false,
   loading: () => <AppLoading />, 
 });
 
-// Sekarang, halaman utama akan langsung merender komponen Demo
 export default function Home() {
   return <Demo title={APP_NAME} />;
 }
