@@ -1,4 +1,4 @@
-// src/app/quests/page.tsx (Versi Final dengan Logika "Done" yang Benar)
+// src/app/quests/page.tsx (Versi dengan verifikasi)
 "use client";
 
 import { useEffect, useState, useMemo } from 'react';
@@ -15,10 +15,9 @@ interface Quest {
   description: string;
   points: number;
   verification_logic: string;
-  is_recurring: boolean; // <-- Kita akan gunakan ini
+  is_recurring: boolean;
 }
 
-// Tipe data baru untuk menyimpan data penyelesaian
 interface Completion {
   quest_id: number;
   completed_at: string;
@@ -29,12 +28,12 @@ export default function QuestsPage() {
   const userFid = context?.user?.fid;
 
   const [quests, setQuests] = useState<Quest[]>([]);
-  // State sekarang menyimpan data penyelesaian yang lebih lengkap
   const [completions, setCompletions] = useState<Completion[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [verifyingQuestId, setVerifyingQuestId] = useState<number | null>(null);
 
-  useEffect(() => {
-    const fetchQuestData = async () => {
+  const fetchQuestData = async () => {
+      // Fungsi ini tidak berubah
       setIsLoading(true);
       try {
         const questsResponse = await fetch('/api/quests/list');
@@ -44,7 +43,6 @@ export default function QuestsPage() {
         if (userFid) {
           const completedResponse = await fetch(`/api/user/completed-quests?fid=${userFid}`);
           const completedData = await completedResponse.json();
-          // Simpan data penyelesaian lengkap
           setCompletions(completedData.completions || []);
         }
       } catch (error) {
@@ -52,39 +50,82 @@ export default function QuestsPage() {
       } finally {
         setIsLoading(false);
       }
-    };
+  };
+
+  useEffect(() => {
     fetchQuestData();
   }, [userFid]);
 
-  // Fungsi untuk mengecek apakah sebuah quest sudah selesai
+  // ===============================================
+  // FUNGSI BARU UNTUK VERIFIKASI
+  // ===============================================
+  const handleVerify = async (questId: number) => {
+    if (!userFid) {
+      alert("Please login to verify quests.");
+      return;
+    }
+    setVerifyingQuestId(questId);
+    try {
+      const response = await fetch('/api/quests/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ questId, userFid }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert("Quest completed! 🎉");
+        // Refresh data untuk menampilkan status "Done"
+        await fetchQuestData(); 
+      } else {
+        alert(`Verification failed: ${result.message || 'Please ensure you have completed the task.'}`);
+      }
+    } catch (error) {
+      alert("An error occurred during verification.");
+      console.error(error);
+    } finally {
+      setVerifyingQuestId(null);
+    }
+  };
+
+
   const isQuestCompleted = (quest: Quest): boolean => {
+    // ... (fungsi ini tidak berubah)
     const completion = completions.find(c => c.quest_id === quest.id);
-    if (!completion) return false; // Belum pernah selesai
-
-    // Jika quest tidak bisa diulang, maka selalu dianggap selesai
+    if (!completion) return false;
     if (!quest.is_recurring) return true;
-
-    // Jika bisa diulang (seperti kuis mingguan)
-    // Cek apakah sudah diselesaikan dalam 7 hari terakhir
     const completionDate = new Date(completion.completed_at);
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     return completionDate > sevenDaysAgo;
   };
 
+  // ===============================================
+  // FUNGSI RENDER DIPERBARUI
+  // ===============================================
   const renderQuestAction = (quest: Quest) => {
-    // Tombol "Start" untuk kuis
+    const isLoading = verifyingQuestId === quest.id;
+
     if (quest.verification_logic === 'complete_weekly_quiz') {
       return (
         <Link href="/quiz">
-          <Button>Start</Button>
+          <Button isLoading={isLoading}>Start</Button>
         </Link>
       );
     }
+    // Logika baru untuk quest follow
+    if (quest.verification_logic.startsWith('follow_fid:')) {
+      return (
+        <Button onClick={() => handleVerify(quest.id)} isLoading={isLoading}>
+          Verify
+        </Button>
+      );
+    }
+    
     return <Button disabled>Start</Button>;
   };
-  
-  const questsToShow = quests; // Tampilkan semua quest aktif
+
+  // ... (sisa JSX tidak berubah, sama seperti sebelumnya) ...
+  const questsToShow = quests;
 
   return (
     <div>
