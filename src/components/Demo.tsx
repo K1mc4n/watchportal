@@ -1,4 +1,4 @@
-// src/components/Demo.tsx (Versi Baru)
+// src/components/Demo.tsx
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
@@ -86,10 +86,10 @@ export default function Demo({ title }: { title?: string }) {
       <div className="mx-auto py-2 px-4 pb-20">
         <Header />
         
-        {/* BLOK GAMBAR LOGO DI TENGAH TELAH DIHAPUS DARI SINI */}
+        {/* LOGO DI TENGAH SUDAH DIHAPUS DARI SINI */}
         
         {/* Search Input */}
-        <div className="px-2 mb-6 mt-4"> {/* Menambahkan margin top untuk memberi ruang setelah header */}
+        <div className="px-2 mb-6 mt-4">
           <input
             type="text"
             value={searchTerm}
