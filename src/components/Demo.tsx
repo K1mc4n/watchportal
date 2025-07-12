@@ -91,8 +91,8 @@ export default function Demo({ title }: { title?: string }) {
           <Image
             src="/Midlogo.png" // <- NAMA FILE DIGANTI DI SINI
             alt="Watch Portal"
-            width={800} 
-            height={260} 
+            width={1200} 
+            height={390} 
             priority
             className="w-full max-w-xl object-contain"
           />
