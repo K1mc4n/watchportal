@@ -33,8 +33,6 @@ export async function POST(request: NextRequest) {
     let isCompleted = false;
     const neynar = getNeynarClient();
 
-    // --- LOGIKA VERIFIKASI UTAMA ---
-
     if (quest.verification_logic.startsWith('follow_fid:')) {
       const targetFid = parseInt(quest.verification_logic.split(':')[1]);
       const { users } = await neynar.fetchBulkUsers({ fids: [targetFid], viewerFid: userFid });
@@ -57,7 +55,7 @@ export async function POST(request: NextRequest) {
 
       let balanceCheckPassed = false;
       for (const userWallet of wallets) {
-        if (balanceCheckPassed) break; // Jika sudah ditemukan, hentikan loop
+        if (balanceCheckPassed) break;
         let hasBalance = false;
         
         if (quest.verification_logic.startsWith('hold_token:')) {
@@ -65,7 +63,10 @@ export async function POST(request: NextRequest) {
             // =================================================================
             // ==== AWAL PERBAIKAN LOGIKA HOLD_TOKEN ====
             // =================================================================
-            if (parts.length !== 4) throw new Error(`Invalid hold_token logic format. Expected 'hold_token:CHAIN:CONTRACT:AMOUNT:DECIMALS', got: ${quest.verification_logic}`);
+            if (parts.length !== 5) {
+                // Pesan error ini sekarang akan menampilkan format yang benar
+                throw new Error(`Verification failed: Invalid hold_token logic format. Expected 'hold_token:CHAIN:CONTRACT:AMOUNT:DECIMALS', got: ${quest.verification_logic}`);
+            }
             const [_, chainName, contractAddress, minAmount, decimals] = parts;
             hasBalance = await checkTokenBalance(chainName, userWallet, contractAddress as Address, minAmount, parseInt(decimals));
             // =================================================================
@@ -74,15 +75,11 @@ export async function POST(request: NextRequest) {
         
         } else if (quest.verification_logic.startsWith('hold_nft:')) {
             const parts = quest.verification_logic.split(':');
-            // =================================================================
-            // ==== AWAL PERBAIKAN LOGIKA HOLD_NFT ====
-            // =================================================================
-            if (parts.length !== 3) throw new Error(`Invalid hold_nft logic format. Expected 'hold_nft:CHAIN:CONTRACT', got: ${quest.verification_logic}`);
+            if (parts.length !== 3) {
+                throw new Error(`Verification failed: Invalid hold_nft logic format. Expected 'hold_nft:CHAIN:CONTRACT', got: ${quest.verification_logic}`);
+            }
             const [_, chainName, contractAddress] = parts;
             hasBalance = await checkNftBalance(chainName, userWallet, contractAddress as Address);
-            // =================================================================
-            // ==== AKHIR PERBAIKAN LOGIKA HOLD_NFT ====
-            // =================================================================
         }
 
         if (hasBalance) {
@@ -109,6 +106,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('[VERIFY QUEST API CATCH BLOCK]', error);
     const message = error instanceof Error ? error.message : "An unknown error occurred.";
-    return NextResponse.json({ success: false, message }, { status: 500 });
+    // Mengembalikan pesan error yang lebih spesifik ke frontend untuk debugging
+    return NextResponse.json({ success: false, message: message }, { status: 500 });
   }
 }
