@@ -2,17 +2,32 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMiniApp } from "@neynar/react";
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from './Button'; 
-import { Trophy } from 'lucide-react';
+import { Trophy } from 'lucide-react'; // Ikon Trophy tetap kita perlukan
 
 export function Header() {
   const { context, actions } = useMiniApp();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const loggedInUser = context?.user;
+  
+  const [totalPoints, setTotalPoints] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (loggedInUser?.fid) {
+      fetch(`/api/user/points?fid=${loggedInUser.fid}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.points !== null) {
+            setTotalPoints(data.points);
+          }
+        })
+        .catch(err => console.error("Failed to fetch user points:", err));
+    }
+  }, [loggedInUser?.fid]);
 
   const handleViewProfile = () => {
     if (loggedInUser && actions?.viewProfile) {
@@ -30,35 +45,20 @@ export function Header() {
     }
   };
 
-  // --- PERUBAHAN UTAMA DI SINI ---
-  // Kita akan selalu merender struktur header yang sama,
-  // dan hanya menampilkan/menyembunyikan bagian profil pengguna.
   return (
     <div className="relative mb-2">
       <div className="flex h-16 items-center justify-between px-2 gap-2">
-        {/* Kontainer untuk item di sebelah kiri */}
+        {/* Kontainer Kiri (Logo & Tombol Beli) */}
         <div className="flex items-center gap-3">
           <Link href="/" className="flex items-center">
-            <Image
-              src="/watchcoin-logo.png"
-              alt="Watch Portal Logo"
-              width={36}
-              height={36}
-              className="rounded-md"
-              priority
-              unoptimized={true}
-            />
+            <Image src="/watchcoin-logo.png" alt="Watch Portal Logo" width={36} height={36} className="rounded-md" priority unoptimized={true} />
           </Link>
-          <Button 
-            onClick={handleBuyLink}
-            variant="secondary"
-            size="sm"
-          >
+          <Button onClick={handleBuyLink} variant="secondary" size="sm">
             Buy Watch
           </Button>
         </div>
         
-        {/* Kontainer untuk item di sebelah kanan */}
+        {/* Kontainer Kanan */}
         <div className="flex items-center gap-3">
           {/* Tombol Leaderboard */}
           <Link href="/leaderboard">
@@ -67,39 +67,36 @@ export function Header() {
             </Button>
           </Link>
 
-          {/* Ikon Profil dan Dropdown (Hanya ditampilkan jika pengguna login) */}
+          {/* --- AWAL PERUBAHAN TAMPILAN POIN --- */}
+          {/* Tampilan Total Poin yang Lebih Sederhana */}
+          {loggedInUser && (
+            <div className="flex items-center justify-center bg-neutral-800 px-4 py-2 rounded-full border border-neutral-700">
+              <p className="text-md font-bold text-white leading-none">
+                {totalPoints !== null ? totalPoints : '...'}
+              </p>
+            </div>
+          )}
+          {/* --- AKHIR PERUBAHAN TAMPILAN POIN --- */}
+
+
+          {/* Ikon Profil dan Dropdown */}
           {loggedInUser && (
             <div className="relative">
-              <div 
-                className="cursor-pointer"
-                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
-              >
-                {loggedInUser.pfpUrl ? (
-                  <Image 
-                    src={loggedInUser.pfpUrl} 
-                    alt="Profile" 
-                    className="w-10 h-10 rounded-full border-2 border-gold"
-                    width={40}
-                    height={40}
-                    key={loggedInUser.fid}
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full border-2 border-gold bg-neutral-700 flex items-center justify-center text-white font-bold">
-                    {loggedInUser.username?.charAt(0).toUpperCase()}
-                  </div>
-                )}
+              <div className="cursor-pointer" onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}>
+                <Image 
+                  src={loggedInUser.pfpUrl!} 
+                  alt="Profile" 
+                  className="w-10 h-10 rounded-full border-2 border-gold"
+                  width={40} height={40} key={loggedInUser.fid}
+                />
               </div>
-              
               {isUserDropdownOpen && (
                 <div className="absolute top-full right-0 z-50 mt-1 w-40 bg-neutral-900 rounded-lg shadow-lg border border-neutral-700 p-2">
                   <div className="text-right px-2 py-1 mb-2 border-b border-neutral-700">
-                      <p className="font-bold text-sm text-white truncate">{loggedInUser.displayName || loggedInUser.username}</p>
-                      <p className="text-xs text-gray-400 truncate">@{loggedInUser.username}</p>
+                    <p className="font-bold text-sm text-white truncate">{loggedInUser.displayName || loggedInUser.username}</p>
+                    <p className="text-xs text-gray-400 truncate">@{loggedInUser.username}</p>
                   </div>
-                  <button
-                    onClick={handleViewProfile}
-                    className="w-full text-left px-2 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800 rounded-md"
-                  >
+                  <button onClick={handleViewProfile} className="w-full text-left px-2 py-1.5 text-sm text-neutral-300 hover:bg-neutral-800 rounded-md">
                     View Profile
                   </button>
                 </div>
@@ -107,9 +104,12 @@ export function Header() {
             </div>
           )}
           
-          {/* Placeholder jika TIDAK ada pengguna yang login */}
+          {/* Placeholder jika TIDAK ada pengguna */}
           {!loggedInUser && (
-             <div className="w-10 h-10 rounded-full bg-neutral-800 border-2 border-neutral-700" />
+            <div className="flex items-center gap-2">
+               <div className="w-10 h-10 rounded-full bg-neutral-800 border-2 border-neutral-700" />
+               <div className="w-10 h-10 rounded-full bg-neutral-800 border-2 border-neutral-700" />
+            </div>
           )}
         </div>
       </div>
