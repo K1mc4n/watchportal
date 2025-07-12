@@ -1,4 +1,4 @@
-// Ganti seluruh isi file: src/app/api/quests/verify/route.ts
+// Lokasi file: src/app/api/quests/verify/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '~/lib/supabase';
@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
       .from('quests').select('*').eq('id', questId).single();
       
     if (questError || !quest) {
-      console.error(`[Verify] Quest not found for ID: ${questId}. Error:`, questError);
       return NextResponse.json({ success: false, message: 'Quest not found.' }, { status: 404 });
     }
     console.log(`[Verify] Found quest: "${quest.title}"`);
@@ -36,32 +35,16 @@ export async function POST(request: NextRequest) {
 
     // --- LOGIKA VERIFIKASI UTAMA ---
 
-    // =================================================================
-    // ==== AWAL PERBAIKAN LOGIKA FOLLOW ====
-    // =================================================================
     if (quest.verification_logic.startsWith('follow_fid:')) {
       const targetFid = parseInt(quest.verification_logic.split(':')[1]);
-      if (isNaN(targetFid)) throw new Error('Invalid FID in verification_logic');
-      
-      console.log(`[Verify] Checking if FID ${userFid} follows target FID ${targetFid}...`);
-
-      // Kita fetch profil TARGET_FID dari perspektif USER_FID
       const { users } = await neynar.fetchBulkUsers({ fids: [targetFid], viewerFid: userFid });
 
-      // Cek apakah di konteks viewer (userFid), dia (viewer) mengikuti targetFid
       if (users[0]?.viewer_context?.following) {
-        console.log(`[Verify] Verification SUCCESS: FID ${userFid} follows FID ${targetFid}.`);
         isCompleted = true;
       } else {
-        console.log(`[Verify] Verification FAILED: FID ${userFid} does NOT follow FID ${targetFid}.`);
         return NextResponse.json({ success: false, message: `Verification failed: You are not following the target user.` });
       }
-    // =================================================================
-    // ==== AKHIR PERBAIKAN LOGIKA FOLLOW ====
-    // =================================================================
-
     } else if (quest.verification_logic.startsWith('hold_token:') || quest.verification_logic.startsWith('hold_nft:')) {
-      // Untuk verifikasi on-chain, pertama kita butuh alamat wallet pengguna
       const { users } = await neynar.fetchBulkUsers({ fids: [userFid] });
       const wallets = users[0]?.verifications?.map(addr => addr as Address) ?? [];
       if (users[0]?.custody_address) {
@@ -69,31 +52,41 @@ export async function POST(request: NextRequest) {
       }
 
       if (wallets.length === 0) {
-        return NextResponse.json({ success: false, message: 'Could not find a verified wallet for your Farcaster account. Please add one to your profile.' });
+        return NextResponse.json({ success: false, message: 'Could not find a verified wallet for your Farcaster account.' });
       }
 
       let balanceCheckPassed = false;
       for (const userWallet of wallets) {
+        if (balanceCheckPassed) break; // Jika sudah ditemukan, hentikan loop
         let hasBalance = false;
+        
         if (quest.verification_logic.startsWith('hold_token:')) {
-          const parts = quest.verification_logic.split(':');
-          // PERBAIKAN: Format lama hold_token:CONTRACT:AMOUNT:DECIMALS memiliki 4 bagian
-          if (parts.length !== 4) throw new Error(`Invalid hold_token logic format: ${quest.verification_logic}`);
-          const [_, contractAddress, minAmount, decimals] = parts;
-          // Asumsi verifikasi on-chain terjadi di 'Base' jika tidak dispesifikasi
-          hasBalance = await checkTokenBalance("Base", userWallet, contractAddress as Address, minAmount, parseInt(decimals));
+            const parts = quest.verification_logic.split(':');
+            // =================================================================
+            // ==== AWAL PERBAIKAN LOGIKA HOLD_TOKEN ====
+            // =================================================================
+            if (parts.length !== 4) throw new Error(`Invalid hold_token logic format. Expected 'hold_token:CHAIN:CONTRACT:AMOUNT:DECIMALS', got: ${quest.verification_logic}`);
+            const [_, chainName, contractAddress, minAmount, decimals] = parts;
+            hasBalance = await checkTokenBalance(chainName, userWallet, contractAddress as Address, minAmount, parseInt(decimals));
+            // =================================================================
+            // ==== AKHIR PERBAIKAN LOGIKA HOLD_TOKEN ====
+            // =================================================================
         
         } else if (quest.verification_logic.startsWith('hold_nft:')) {
-          const parts = quest.verification_logic.split(':');
-          // PERBAIKAN: Format lama hold_nft:CONTRACT memiliki 2 bagian
-          if (parts.length !== 2) throw new Error(`Invalid hold_nft logic format: ${quest.verification_logic}`);
-          const [_, contractAddress] = parts;
-          hasBalance = await checkNftBalance("Base", userWallet, contractAddress as Address);
+            const parts = quest.verification_logic.split(':');
+            // =================================================================
+            // ==== AWAL PERBAIKAN LOGIKA HOLD_NFT ====
+            // =================================================================
+            if (parts.length !== 3) throw new Error(`Invalid hold_nft logic format. Expected 'hold_nft:CHAIN:CONTRACT', got: ${quest.verification_logic}`);
+            const [_, chainName, contractAddress] = parts;
+            hasBalance = await checkNftBalance(chainName, userWallet, contractAddress as Address);
+            // =================================================================
+            // ==== AKHIR PERBAIKAN LOGIKA HOLD_NFT ====
+            // =================================================================
         }
 
         if (hasBalance) {
           balanceCheckPassed = true;
-          break;
         }
       }
 
@@ -102,17 +95,12 @@ export async function POST(request: NextRequest) {
           return NextResponse.json({ success: false, message: `Verification failed: You do not hold the required asset in any of your verified wallets.` });
       }
     } else if (quest.verification_logic.startsWith('share_link:')) {
-        // Untuk quest 'share', kita langsung anggap berhasil setelah tombol diklik
         isCompleted = true;
     }
 
-
     if (isCompleted) {
-      console.log(`[Verify] Task is completed. Awarding points for FID: ${userFid}`);
-      
       await supabase.from('user_quest_completions').insert({ user_fid: userFid, quest_id: quest.id }).throwOnError();
       await supabase.rpc('add_user_points', { p_user_fid: userFid, p_points_to_add: quest.points }).throwOnError();
-      
       return NextResponse.json({ success: true, message: `Quest "${quest.title}" completed! You earned ${quest.points} points.` });
     }
 
