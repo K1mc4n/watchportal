@@ -33,10 +33,15 @@ export const NewsArticleCard = ({ article }: NewsArticleCardProps) => {
     day: 'numeric',
   });
 
+  // =======================================================
+  // == PERUBAHAN ADA DI SINI ==
+  // =======================================================
+  // Kita ubah teks dan tambahkan embed kedua yang mengarah ke Watch Portal
   const castConfig = {
-    text: `Interesting read: "${article.title}"\n\nShared from ${APP_NAME}.`,
-    embeds: [article.url] as [string],
+    text: `Interesting read from ${APP_NAME}:\n\n"${article.title}"`,
+    embeds: [article.url, 'https://watchportal.vercel.app/'] as [string, string],
   };
+  // =======================================================
 
   const handleCopyLink = (e: React.MouseEvent) => {
     e.stopPropagation(); 
@@ -60,7 +65,6 @@ export const NewsArticleCard = ({ article }: NewsArticleCardProps) => {
         )}
       </a>
       <div className="p-4">
-        {/* UBAH WARNA DI SINI */}
         <div className="text-xs font-semibold text-gold uppercase">
           {article.source.name}
         </div>
