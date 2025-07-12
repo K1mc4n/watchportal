@@ -1,4 +1,5 @@
-// src/app/leaderboard/page.tsx
+// Lokasi file: src/app/leaderboard/page.tsx
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -7,6 +8,8 @@ import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
 import { LoaderCircle, Award } from 'lucide-react';
 import { getWeek } from 'date-fns';
+// --- 1. Impor hook useMiniApp ---
+import { useMiniApp } from '@neynar/react';
 
 interface LeaderboardEntry {
   user_fid: number;
@@ -26,6 +29,9 @@ export default function LeaderboardPage() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // --- 2. Panggil hook useMiniApp untuk mendapatkan 'actions' ---
+  const { actions } = useMiniApp();
 
   const weekNumber = getWeek(new Date());
 
@@ -49,6 +55,16 @@ export default function LeaderboardPage() {
 
     fetchLeaderboard();
   }, []);
+
+  // --- 3. Buat fungsi untuk menangani klik profil ---
+  const handleViewProfile = (fid: number) => {
+    if (actions?.viewProfile) {
+      actions.viewProfile({ fid });
+    } else {
+      // Fallback untuk browser biasa
+      window.open(`https://warpcast.com/${fid}`, '_blank');
+    }
+  };
 
   return (
     <div>
@@ -80,7 +96,13 @@ export default function LeaderboardPage() {
                     className="rounded-full mx-4"
                   />
                   <div className="flex-grow">
-                    <p className="font-semibold text-white">@{entry.username}</p>
+                    {/* --- 4. Buat username bisa diklik --- */}
+                    <p 
+                      className="font-semibold text-white hover:underline cursor-pointer"
+                      onClick={() => handleViewProfile(entry.user_fid)}
+                    >
+                      @{entry.username}
+                    </p>
                   </div>
                   <div className="text-lg font-bold text-gold">{entry.score} pts</div>
                 </div>
