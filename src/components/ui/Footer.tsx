@@ -1,8 +1,10 @@
-// src/components/ui/Footer.tsx (Versi dengan 7 Tombol)
+// Lokasi file: src/components/ui/Footer.tsx
+
 'use client';
 
 import { useState } from 'react';
-import { Home, Newspaper, PlusSquare, MessageCircle, Trophy, Swords, ListChecks, type LucideIcon } from 'lucide-react'; 
+// Hapus 'Trophy' dari daftar impor
+import { Home, Newspaper, PlusSquare, MessageCircle, Swords, ListChecks, type LucideIcon } from 'lucide-react'; 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChatWindow } from '~/components/ui/ChatWindow';
@@ -32,14 +34,14 @@ export function Footer() {
   const handleToggleChat = () => setIsChatOpen(!isChatOpen);
   const handleCloseChat = () => setIsChatOpen(false);
 
-  const getActiveTab = (): 'home' | 'news' | 'submit' | 'quiz' | 'quests' | 'leaderboard' | 'chat' | null => {
+  // Hapus 'leaderboard' dari tipe dan fungsi
+  const getActiveTab = (): 'home' | 'news' | 'submit' | 'quiz' | 'quests' | 'chat' | null => {
     if (isChatOpen) return 'chat';
-    if (pathname.startsWith('/leaderboard')) return 'leaderboard';
+    if (pathname.startsWith('/leaderboard')) return null; // Leaderboard tidak lagi memiliki status aktif di footer
     if (pathname.startsWith('/quiz')) return 'quiz';
     if (pathname.startsWith('/quests')) return 'quests';
     if (pathname.startsWith('/news')) return 'news';
     if (pathname.startsWith('/submit')) return 'submit';
-    // ==== PERUBAHAN DI SINI: Tab Home aktif jika path adalah '/' ====
     if (pathname === '/') return 'home'; 
     return null;
   };
@@ -51,13 +53,12 @@ export function Footer() {
       {isChatOpen && <ChatWindow onClose={handleCloseChat} />}
 
       <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900 border-t border-neutral-700 shadow-lg">
+        {/* Hapus NavItem untuk Leaderboard */}
         <div className="flex justify-around max-w-lg mx-auto px-1">
-          {/* ==== PERUBAHAN DI SINI: href mengarah ke "/" ==== */}
           <NavItem href="/" icon={Home} label="Home" isActive={activeTab === 'home'} />
           <NavItem href="/news" icon={Newspaper} label="News" isActive={activeTab === 'news'} />
           <NavItem href="/quests" icon={ListChecks} label="Quests" isActive={activeTab === 'quests'} />
           <NavItem href="/quiz" icon={Swords} label="Challenge" isActive={activeTab === 'quiz'} />
-          <NavItem href="/leaderboard" icon={Trophy} label="Leaders" isActive={activeTab === 'leaderboard'} />
           <NavItem href="/submit" icon={PlusSquare} label="Submit" isActive={activeTab === 'submit'} />
           <ChatButton onClick={handleToggleChat} isActive={activeTab === 'chat'} />
         </div>
