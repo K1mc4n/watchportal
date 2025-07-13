@@ -1,9 +1,13 @@
-// src/app/layout.tsx
+// Lokasi file: src/app/layout.tsx
 
 import type { Metadata } from "next";
-import "~/app/globals.css";
+import "~/app/globals.css"; // Impor CSS global kita
 import { Providers } from "~/app/providers";
 import { APP_NAME, APP_DESCRIPTION } from "~/lib/constants";
+// Anda bisa menambahkan impor font di sini jika belum ada
+import { Inter } from "next/font/google";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -16,7 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    // Terapkan kelas font ke html atau body
+    <html lang="en" className={inter.className}>
       <body>
         <Providers>
           {children}
