@@ -1,4 +1,4 @@
-// Lokasi file: src/app/trending/page.tsx (VERSI FINAL & BERSIH)
+// Lokasi file: src/app/trending/page.tsx (VERSI BERSIH TANPA DUPLIKAT)
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -14,8 +14,20 @@ interface Pool {
   volume_h24_usd: string;
 }
 
-const formatCurrency = (value: string | number) => { /* ... (tidak berubah) ... */ };
-const formatVolume = (value: string | number) => { /* ... (tidak berubah) ... */ };
+// Deklarasi helper function HANYA SATU KALI di sini
+const formatCurrency = (value: string | number) => {
+    const num = Number(value);
+    if (isNaN(num)) return '$0.00';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(num);
+};
+
+const formatVolume = (value: string | number) => {
+    const num = Number(value);
+    if (isNaN(num)) return '$0';
+    if (num > 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
+    if (num > 1_000) return `$${(num / 1_000).toFixed(1)}K`;
+    return `$${num.toFixed(0)}`;
+};
 
 export default function TrendingPage() {
   const [pools, setPools] = useState<Pool[]>([]);
@@ -58,11 +70,7 @@ export default function TrendingPage() {
             {pools.map((pool, index) => {
               const priceChange = parseFloat(pool.price_change_percentage_h24);
               const isPositive = priceChange >= 0;
-
-              // ===========================================
-              // ==== LOGIKA EKSTRAKSI PALING SEDERHANA ====
-              // ===========================================
-              // Ambil nama dari pool.name, pisahkan berdasarkan spasi
+              
               const nameParts = pool.name.split(' ');
               const pairSymbols = `${nameParts[0]} / ${nameParts[1]}`;
 
@@ -72,7 +80,6 @@ export default function TrendingPage() {
                     <div className="flex items-center">
                       <span className="text-lg font-bold text-neutral-500 w-8">{index + 1}</span>
                       <div className='ml-2'>
-                        {/* Langsung tampilkan simbol yang sudah dipisahkan */}
                         <p className="font-bold text-lg">{pairSymbols}</p>
                       </div>
                     </div>
@@ -98,18 +105,3 @@ export default function TrendingPage() {
     </>
   );
 }
-
-// Salin helper function lagi
-const formatCurrency = (value: string | number) => {
-    const num = Number(value);
-    if (isNaN(num)) return '$0.00';
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(num);
-};
-
-const formatVolume = (value: string | number) => {
-    const num = Number(value);
-    if (isNaN(num)) return '$0';
-    if (num > 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
-    if (num > 1_000) return `$${(num / 1_000).toFixed(1)}K`;
-    return `$${num.toFixed(0)}`;
-};
