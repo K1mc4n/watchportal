@@ -1,4 +1,4 @@
-// Lokasi file: src/app/trending/page.tsx (VERSI BERSIH TANPA DUPLIKAT)
+// Lokasi file: src/app/trending/page.tsx (VERSI PALING SEDERHANA & AMAN)
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,6 +6,7 @@ import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
 import { LoaderCircle, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react';
 
+// Interface disederhanakan, sesuai dengan data yang kita kirim dari API
 interface Pool {
   id: string;
   name: string;
@@ -14,7 +15,6 @@ interface Pool {
   volume_h24_usd: string;
 }
 
-// Deklarasi helper function HANYA SATU KALI di sini
 const formatCurrency = (value: string | number) => {
     const num = Number(value);
     if (isNaN(num)) return '$0.00';
@@ -70,9 +70,6 @@ export default function TrendingPage() {
             {pools.map((pool, index) => {
               const priceChange = parseFloat(pool.price_change_percentage_h24);
               const isPositive = priceChange >= 0;
-              
-              const nameParts = pool.name.split(' ');
-              const pairSymbols = `${nameParts[0]} / ${nameParts[1]}`;
 
               return (
                 <div key={pool.id} className="bg-neutral-800 p-4 rounded-xl border border-neutral-700 hover:border-gold/50 transition-all">
@@ -80,7 +77,8 @@ export default function TrendingPage() {
                     <div className="flex items-center">
                       <span className="text-lg font-bold text-neutral-500 w-8">{index + 1}</span>
                       <div className='ml-2'>
-                        <p className="font-bold text-lg">{pairSymbols}</p>
+                        {/* ==== PERUBAHAN UTAMA: TAMPILKAN pool.name APA ADANYA ==== */}
+                        <p className="font-bold text-lg">{pool.name}</p>
                       </div>
                     </div>
                     <div className="text-right">
