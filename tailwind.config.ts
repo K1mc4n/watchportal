@@ -10,13 +10,12 @@ export default {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    extend: {
-      colors: {
-        // -- PALET WARNA BARU --
-        'gold': '#E6B325', // Emas utama yang cerah
+  	extend: {
+  		colors: {
+        'gold': '#E6B325',
         'brand': {
-            'light': '#F0C43E', // Emas yang lebih terang untuk highlight
-            'dark': '#C89B1C'   // Emas yang lebih gelap untuk hover/shadow
+            'light': '#F0C43E',
+            'dark': '#C89B1C'
         },
         'neutral': {
           '50': '#f8f8f8',
@@ -31,15 +30,14 @@ export default {
           '900': '#121212',
           '950': '#0a0a0a',
         },
-        background: 'var(--background)',
-        foreground: 'var(--foreground)'
-      },
-      borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)'
-      },
-      // --- EFEK BARU ---
+  			background: 'var(--background)',
+  			foreground: 'var(--foreground)'
+  		},
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
       keyframes: {
         "shine-effect": {
           "0%": { transform: "translateX(-100%) translateY(-100%) rotate(30deg)" },
@@ -49,7 +47,7 @@ export default {
       animation: {
         "shine": "shine-effect 1s forwards",
       },
-    }
+  	}
   },
   plugins: [require("tailwindcss-animate")],
 } satisfies Config;
