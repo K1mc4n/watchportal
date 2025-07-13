@@ -1,4 +1,4 @@
-// Lokasi file: src/app/trending/page.tsx (VERSI SUPER FINAL)
+// Lokasi file: src/app/trending/page.tsx (VERSI FINAL & BERSIH)
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -14,19 +14,8 @@ interface Pool {
   volume_h24_usd: string;
 }
 
-// Helper format angka tetap sama
-const formatCurrency = (value: string | number) => {
-    const num = Number(value);
-    if (isNaN(num)) return '$0.00';
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(num);
-};
-const formatVolume = (value: string | number) => {
-    const num = Number(value);
-    if (isNaN(num)) return '$0';
-    if (num > 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
-    if (num > 1_000) return `$${(num / 1_000).toFixed(1)}K`;
-    return `$${num.toFixed(0)}`;
-};
+const formatCurrency = (value: string | number) => { /* ... (tidak berubah) ... */ };
+const formatVolume = (value: string | number) => { /* ... (tidak berubah) ... */ };
 
 export default function TrendingPage() {
   const [pools, setPools] = useState<Pool[]>([]);
@@ -71,12 +60,11 @@ export default function TrendingPage() {
               const isPositive = priceChange >= 0;
 
               // ===========================================
-              // ==== LOGIKA EKSTRAKSI PALING TANGGUH ====
+              // ==== LOGIKA EKSTRAKSI PALING SEDERHANA ====
               // ===========================================
-              const parts = pool.name.split(' ');
-              const token1 = parts[0] ?? 'N/A';
-              const token2 = parts[1] ?? 'N/A'; // Akan menjadi 'undefined' jika tidak ada spasi
-              const fee = parts[2] ?? '';
+              // Ambil nama dari pool.name, pisahkan berdasarkan spasi
+              const nameParts = pool.name.split(' ');
+              const pairSymbols = `${nameParts[0]} / ${nameParts[1]}`;
 
               return (
                 <div key={pool.id} className="bg-neutral-800 p-4 rounded-xl border border-neutral-700 hover:border-gold/50 transition-all">
@@ -84,9 +72,8 @@ export default function TrendingPage() {
                     <div className="flex items-center">
                       <span className="text-lg font-bold text-neutral-500 w-8">{index + 1}</span>
                       <div className='ml-2'>
-                        {/* Tampilkan hasil ekstraksi kita */}
-                        <p className="font-bold text-lg">{token1} / {token2}</p>
-                        <p className="text-xs text-neutral-400">{fee}</p>
+                        {/* Langsung tampilkan simbol yang sudah dipisahkan */}
+                        <p className="font-bold text-lg">{pairSymbols}</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -111,3 +98,18 @@ export default function TrendingPage() {
     </>
   );
 }
+
+// Salin helper function lagi
+const formatCurrency = (value: string | number) => {
+    const num = Number(value);
+    if (isNaN(num)) return '$0.00';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(num);
+};
+
+const formatVolume = (value: string | number) => {
+    const num = Number(value);
+    if (isNaN(num)) return '$0';
+    if (num > 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
+    if (num > 1_000) return `$${(num / 1_000).toFixed(1)}K`;
+    return `$${num.toFixed(0)}`;
+};
