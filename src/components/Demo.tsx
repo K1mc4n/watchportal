@@ -9,7 +9,8 @@ import { Footer } from "./ui/Footer";
 import { MiniAppCard } from "./ui/MiniAppCard";
 import { type MiniApp } from "~/lib/miniAppsData";
 import { ActionCard } from "./ui/ActionCard"; 
-import { Newspaper, ListChecks, Swords } from 'lucide-react';
+// Impor ikon baru untuk Trending
+import { Newspaper, ListChecks, Swords, TrendingUp } from 'lucide-react';
 
 interface ThemedFeedProps {
   title?: string;
@@ -46,8 +47,6 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
   return (
     <>
       <Header />
-      {/* ==== PERBAIKAN UTAMA DI SINI ==== */}
-      {/* Menambahkan padding-bottom yang besar (pb-32) untuk memberi ruang bagi footer */}
       <main className="mx-auto py-6 px-4 pb-32 max-w-2xl">
         <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400 mb-2">
           Watch Portal
@@ -75,10 +74,44 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
             </div>
         </div>
         
-        <div className="my-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <ActionCard href="/news" icon={Newspaper} title="Web3 News" description="Stay updated" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
-            <ActionCard href="/quests" icon={ListChecks} title="Quests" description="Earn points" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
-            <ActionCard href="/quiz" icon={Swords} title="Challenge" description="Test your knowledge" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
+        {/* === BAGIAN ACTION CARD YANG DIPERBARUI === */}
+        <div className="my-8 grid grid-cols-2 gap-4">
+            <ActionCard 
+              href="/trending" 
+              icon={TrendingUp} 
+              title="Hot Pairs" 
+              description="Trending on Base" 
+              className="col-span-2 bg-gradient-to-br from-gold/20 to-neutral-800 border-gold/50 hover:bg-gold/10" 
+            />
+            <ActionCard 
+              href="/news" 
+              icon={Newspaper} 
+              title="Web3 News" 
+              description="Stay updated" 
+              className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" 
+            />
+            <ActionCard 
+              href="/quests" 
+              icon={ListChecks} 
+              title="Quests" 
+              description="Earn points" 
+              className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" 
+            />
+            <ActionCard 
+              href="/quiz" 
+              icon={Swords} 
+              title="Challenge" 
+              description="Test knowledge" 
+              className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" 
+            />
+            {/* Kartu kelima ditambahkan di sini agar gridnya seimbang */}
+             <ActionCard 
+              href="/submit" 
+              icon={PlusSquare} 
+              title="Submit App" 
+              description="Share your tool" 
+              className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" 
+            />
         </div>
 
         <div>
@@ -101,3 +134,6 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
     </>
   );
 }
+
+// Tambahkan impor PlusSquare
+import { PlusSquare } from 'lucide-react';
