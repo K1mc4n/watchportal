@@ -4,14 +4,14 @@
 import { useState, useEffect } from 'react';
 import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
-import { LoaderCircle, TrendingUp, ChevronsRight, ArrowDown, ArrowUp } from 'lucide-react';
+import { LoaderCircle, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react';
 import Link from 'next/link';
 
+// Interface tetap sama, ini sudah benar
 interface Token {
   name: string;
   symbol: string;
 }
-
 interface Pool {
   id: string;
   address: string;
@@ -23,13 +23,12 @@ interface Pool {
   quote_token: Token;
 }
 
-// Helper untuk format angka
+// Helper format angka tetap sama
 const formatCurrency = (value: string | number) => {
     const num = Number(value);
     if (isNaN(num)) return '$0.00';
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(num);
 };
-
 const formatVolume = (value: string | number) => {
     const num = Number(value);
     if (isNaN(num)) return '$0';
@@ -86,7 +85,10 @@ export default function TrendingPage() {
                     <div className="flex items-center">
                       <span className="text-lg font-bold text-neutral-500 w-8">{index + 1}</span>
                       <div className='ml-2'>
+                        {/* ==== PERBAIKAN UTAMA DI SINI ==== */}
+                        {/* Menampilkan simbol dari base_token dan quote_token */}
                         <p className="font-bold text-lg">{pool.base_token.symbol} / {pool.quote_token.symbol}</p>
+                        {/* Menampilkan nama pool yang lebih deskriptif di bawahnya */}
                         <p className="text-xs text-neutral-400">{pool.name}</p>
                       </div>
                     </div>
