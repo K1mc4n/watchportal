@@ -1,14 +1,14 @@
 // Lokasi file: src/components/HomeClient.tsx
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import AppLoading from '~/components/AppLoading';
 import { APP_NAME } from '~/lib/constants';
 import { miniAppsData, type MiniApp } from '~/lib/miniAppsData';
-import { type Article } from '~/components/ui/NewsCard'; // Impor tipe Article
+import { type Article } from '~/components/ui/NewsCard';
 
-// Komponen <Demo> sekarang menjadi ThemedFeed
+// Ganti nama impor dari Demo menjadi ThemedFeed
 const ThemedFeed = dynamic(() => import('~/components/Demo'), {
   ssr: false,
   loading: () => <AppLoading />, 
@@ -20,7 +20,6 @@ export default function HomeClient() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fungsi untuk mengambil semua data yang dibutuhkan feed
     const fetchFeedData = async () => {
       setIsLoading(true);
       try {
@@ -38,7 +37,9 @@ export default function HomeClient() {
         
         if (newsRes.ok) {
           const newsData = await newsRes.json();
-          setNews(newsData.articles || []);
+          // Filter berita yang tidak memiliki judul atau gambar untuk menjaga kebersihan UI
+          const validArticles = (newsData.articles || []).filter((article: Article) => article.title && article.urlToImage);
+          setNews(validArticles);
         }
 
       } catch (error) {
@@ -50,5 +51,6 @@ export default function HomeClient() {
     fetchFeedData();
   }, []);
 
+  // Pastikan props yang dikirim sesuai dengan interface ThemedFeedProps
   return <ThemedFeed title={APP_NAME} apps={apps} news={news} isLoading={isLoading} />;
 }
