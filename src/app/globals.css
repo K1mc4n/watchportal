@@ -37,9 +37,17 @@ body {
   display: none;
 }
 
+/* === PERUBAHAN UTAMA UNTUK OPTIMISASI === */
 @layer components {
+  /* Gaya header default (tanpa blur) */
   .header-sticky {
-    @apply sticky top-0 z-40 w-full backdrop-blur-lg border-b border-neutral-800/50 bg-neutral-900/80;
+    @apply sticky top-0 z-40 w-full;
+    @apply bg-neutral-900 transition-colors duration-300;
     padding-top: env(safe-area-inset-top);
+  }
+
+  /* Kelas ini akan ditambahkan dengan JS saat di-scroll */
+  .scrolled-header {
+    @apply bg-neutral-900/80 backdrop-blur-sm border-b border-neutral-800/50;
   }
 }
