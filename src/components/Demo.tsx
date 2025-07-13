@@ -4,23 +4,20 @@
 import { useState, useMemo } from "react";
 import { useMiniApp } from "@neynar/react";
 import { useDebounce } from 'use-debounce';
-import { MiniAppCard } from "./ui/MiniAppCard";
-import { NewsCard, type Article } from "./ui/NewsCard"; // Pastikan Article di-export dari NewsCard
-import { type MiniApp } from "~/lib/miniAppsData";
 import { Header } from "./ui/Header";
 import { Footer } from "./ui/Footer";
+import { MiniAppCard } from "./ui/MiniAppCard";
+import { type MiniApp } from "~/lib/miniAppsData";
+import { ActionCard } from "./ui/ActionCard"; 
+import { Newspaper, ListChecks, Swords } from 'lucide-react';
 
-// ==== INI BAGIAN PALING PENTING ====
-// Pastikan interface ini mendefinisikan semua props yang kita kirim
 interface ThemedFeedProps {
   title?: string;
   apps: MiniApp[];
-  news: Article[];
   isLoading: boolean;
 }
-// ===================================
 
-export default function ThemedFeed({ title, apps, news, isLoading }: ThemedFeedProps) {
+export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
   const { context, actions } = useMiniApp();
   const [selectedChain, setSelectedChain] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,32 +28,18 @@ export default function ThemedFeed({ title, apps, news, isLoading }: ThemedFeedP
     else window.open(url, '_blank');
   };
 
-  const feedItems = useMemo(() => {
-    // Filter apps terlebih dahulu
-    const filteredApps = apps.filter(app => {
+  const filteredApps = useMemo(() => {
+    return apps.filter(app => {
       const chainMatch = selectedChain === 'All' || app.chain === selectedChain;
       const term = debouncedSearchTerm.toLowerCase();
-      if (!term) return chainMatch; // Jika tidak ada pencarian, hanya filter chain
-      const searchMatch = 
+      if (!term) return chainMatch;
+      return chainMatch && (
         app.name.toLowerCase().includes(term) ||
         app.description.toLowerCase().includes(term) ||
-        (app.tags && app.tags.some(tag => tag.toLowerCase().includes(term)));
-      return chainMatch && searchMatch;
+        (app.tags && app.tags.some(tag => tag.toLowerCase().includes(term)))
+      );
     });
-
-    // Gabungkan apps dan news ke dalam satu feed
-    const combined: ( {type: 'app', data: MiniApp} | {type: 'news', data: Article} )[] = [];
-    let newsIndex = 0;
-    for (let i = 0; i < filteredApps.length; i++) {
-        combined.push({ type: 'app', data: filteredApps[i] });
-        // Sisipkan berita setiap 4 aplikasi, jika berita masih tersedia
-        if ((i + 1) % 4 === 0 && newsIndex < news.length) {
-            combined.push({ type: 'news', data: news[newsIndex] });
-            newsIndex++;
-        }
-    }
-    return combined;
-  }, [selectedChain, debouncedSearchTerm, apps, news]);
+  }, [selectedChain, debouncedSearchTerm, apps]);
 
   const chains = ['All', 'Base', 'Optimism', 'Degen', 'Multi-chain', 'Arbitrum'];
 
@@ -68,10 +51,10 @@ export default function ThemedFeed({ title, apps, news, isLoading }: ThemedFeedP
           Watch Portal
         </h1>
         <p className="text-center text-neutral-400 mb-8">
-          Your portal to the world of crypto news, apps, and on-chain data
+          The Farcaster App Store, supercharged.
         </p>
 
-        <div className="sticky top-0 z-10 pt-4 pb-4 bg-neutral-900/50 backdrop-blur-md -mx-4 px-4">
+        <div className="sticky top-[72px] z-20 pt-2 pb-4 bg-neutral-900/80 backdrop-blur-md -mx-4 px-4">
             <input
                 type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search apps by name, tag, or chain..."
@@ -80,7 +63,7 @@ export default function ThemedFeed({ title, apps, news, isLoading }: ThemedFeedP
             <div className="flex justify-center flex-wrap gap-2 mt-4">
                 {chains.map((chain) => (
                     <button key={chain} onClick={() => setSelectedChain(chain)}
-                        className={`px-3 py-1 text-sm font-semibold rounded-full transition-all duration-200 ${
+                        className={`px-3 py-1.5 text-sm font-semibold rounded-full transition-all duration-200 ${
                             selectedChain === chain ? 'bg-gold text-black shadow-md shadow-gold/20' : 'bg-neutral-700/50 text-neutral-300 hover:bg-neutral-700'
                         }`}
                     >
@@ -89,33 +72,28 @@ export default function ThemedFeed({ title, apps, news, isLoading }: ThemedFeedP
                 ))}
             </div>
         </div>
-
-        <div className="mt-8">
-            {feedItems.map((item, index) => {
-              if (item.type === 'app') {
-                  return (
-                    <div key={`app-grid-${item.data.id}`} className="grid grid-cols-2 gap-4 mb-4">
-                      {feedItems.slice(index, index + 2).map(appItem => appItem.type === 'app' && (
-                        <MiniAppCard key={appItem.data.id} app={appItem.data} onLaunch={handleLaunchApp} />
-                      ))}
-                    </div>
-                  )
-              }
-              if (item.type === 'news') {
-                  return <NewsCard key={`news-${item.data.url}-${index}`} article={item.data} />;
-              }
-              return null;
-            }).filter((_item, index, self) => {
-                // Trik untuk mencegah render ganda kartu aplikasi karena slice di atas
-                if (index > 0 && self[index]?.type === 'app' && self[index-1]?.type === 'app') {
-                    return false;
-                }
-                return true;
-            })}
-        </div>
         
-        {isLoading && <p className="text-center text-neutral-500 mt-8">Loading...</p>}
+        <div className="my-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <ActionCard href="/news" icon={Newspaper} title="Web3 News" description="Stay updated" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
+            <ActionCard href="/quests" icon={ListChecks} title="Quests" description="Earn points" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
+            <ActionCard href="/quiz" icon={Swords} title="Challenge" description="Test your knowledge" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
+        </div>
 
+        <div>
+          <h2 className="text-2xl font-bold mb-4 px-2 text-transparent bg-clip-text bg-gradient-to-r from-gold to-brand-light">
+            ✨ App Directory
+          </h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            {filteredApps.map((app) => (
+              <MiniAppCard key={app.id} app={app} onLaunch={handleLaunchApp} />
+            ))}
+          </div>
+        </div>
+
+        {isLoading && <p className="text-center text-neutral-500 mt-8">Loading community apps...</p>}
+        {!isLoading && filteredApps.length === 0 && (
+            <p className="text-center text-neutral-500 mt-8">No apps found for this filter.</p>
+        )}
       </main>
       <Footer />
     </div>
