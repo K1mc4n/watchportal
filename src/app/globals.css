@@ -2,36 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Mode terang akan kita buat gelap juga, sesuai tema hitam & emas */
-  --background: #111111; /* Latar belakang abu-abu sangat gelap */
-  --foreground: #ededed; /* Teks putih pudar agar tidak terlalu kontras */
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a; /* Latar belakang hitam pekat untuk mode gelap */
-    --foreground: #ededed;
+    --background: theme('colors.neutral.950');
+    --foreground: theme('colors.neutral.50');
+
+    /* Latar belakang gradien untuk body */
+    --background-start: theme('colors.neutral.900');
+    --background-end: theme('colors.neutral.950');
+
+    /* Warna untuk kartu dan elemen UI lainnya */
+    --card: theme('colors.neutral.800');
+    --card-foreground: theme('colors.neutral.100');
+    
+    --primary: theme('colors.gold');
+    --primary-foreground: theme('colors.neutral.950');
+    
+    --secondary: theme('colors.neutral.700');
+    --secondary-foreground: theme('colors.neutral.100');
+    
+    --muted: theme('colors.neutral.800');
+    --muted-foreground: theme('colors.neutral.400');
+    
+    --radius: 0.75rem;
   }
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
-  font-family: 'Inter', Helvetica, Arial, sans-serif;
+  /* Terapkan gradien di sini */
+  background: var(--background-end); /* Fallback untuk browser lama */
+  background: linear-gradient(to bottom, var(--background-start), var(--background-end));
+  min-height: 100vh;
 }
 
 * {
-  scrollbar-width: none; /* Firefox */
-  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
-
 *::-webkit-scrollbar {
   display: none;
-}
-
-@layer base {
-  :root {
-    --radius: 0.5rem;
-  }
 }
