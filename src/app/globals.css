@@ -1,3 +1,5 @@
+/* Lokasi file: src/app/globals.css */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,32 +8,23 @@
   :root {
     --background: theme('colors.neutral.950');
     --foreground: theme('colors.neutral.50');
-
-    /* Latar belakang gradien untuk body */
     --background-start: theme('colors.neutral.900');
     --background-end: theme('colors.neutral.950');
-
-    /* Warna untuk kartu dan elemen UI lainnya */
     --card: theme('colors.neutral.800');
     --card-foreground: theme('colors.neutral.100');
-    
     --primary: theme('colors.gold');
     --primary-foreground: theme('colors.neutral.950');
-    
     --secondary: theme('colors.neutral.700');
     --secondary-foreground: theme('colors.neutral.100');
-    
     --muted: theme('colors.neutral.800');
     --muted-foreground: theme('colors.neutral.400');
-    
     --radius: 0.75rem;
   }
 }
 
 body {
   color: var(--foreground);
-  /* Terapkan gradien di sini */
-  background: var(--background-end); /* Fallback untuk browser lama */
+  background: var(--background-end);
   background: linear-gradient(to bottom, var(--background-start), var(--background-end));
   min-height: 100vh;
 }
@@ -42,4 +35,11 @@ body {
 }
 *::-webkit-scrollbar {
   display: none;
+}
+
+@layer components {
+  .header-sticky {
+    @apply sticky top-0 z-40 w-full backdrop-blur-lg border-b border-neutral-800/50 bg-neutral-900/80;
+    padding-top: env(safe-area-inset-top);
+  }
 }
