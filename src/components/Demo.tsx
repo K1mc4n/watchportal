@@ -46,7 +46,9 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
   return (
     <>
       <Header />
-      <main className="mx-auto py-6 px-4 pb-28 max-w-2xl">
+      {/* ==== PERBAIKAN UTAMA DI SINI ==== */}
+      {/* Menambahkan padding-bottom yang besar (pb-32) untuk memberi ruang bagi footer */}
+      <main className="mx-auto py-6 px-4 pb-32 max-w-2xl">
         <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400 mb-2">
           Watch Portal
         </h1>
@@ -54,8 +56,6 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
           The Farcaster App Store, supercharged.
         </p>
 
-        {/* ==== PERUBAHAN UTAMA DI SINI ==== */}
-        {/* Hapus kelas 'sticky', 'top-[72px]', dan 'z-20' */}
         <div className="pt-2 pb-4">
             <input
                 type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
