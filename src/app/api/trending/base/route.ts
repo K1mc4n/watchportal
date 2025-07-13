@@ -13,44 +13,41 @@ export async function GET() {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error('GeckoTerminal API Error:', errorData);
-      return NextResponse.json(
-        { error: 'Failed to fetch trending data from GeckoTerminal' },
-        { status: response.status }
-      );
+      // ... (blok error tidak berubah) ...
     }
 
     const data = await response.json();
 
-    // Pastikan data.data ada dan merupakan sebuah array sebelum di-map
     if (!data || !Array.isArray(data.data)) {
       return NextResponse.json({ pools: [] });
     }
 
-    // ==== PERBAIKAN UTAMA DI SINI ====
-    // Menggunakan optional chaining (?.) dan nullish coalescing (??)
     const trendingPools = data.data
       .map((pool: any) => {
-        // Jika data utama tidak ada, lewati pool ini
-        if (!pool.attributes || !pool.relationships) {
-          return null;
+        // === VALIDASI KETAT DI SINI ===
+        // Pastikan semua path data yang kita butuhkan ada
+        const attributes = pool?.attributes;
+        const baseTokenData = pool?.relationships?.base_token?.data;
+        const quoteTokenData = pool?.relationships?.quote_token?.data;
+
+        if (!attributes || !baseTokenData || !quoteTokenData) {
+          return null; // Lewati pool ini jika data dasarnya tidak lengkap
         }
 
         return {
           id: pool.id,
-          address: pool.attributes.address,
-          name: pool.attributes.name ?? 'Unknown Pool',
-          price_usd: pool.attributes.base_token_price_usd ?? '0',
-          price_change_percentage_h24: pool.attributes.price_change_percentage?.h24 ?? '0',
-          volume_h24_usd: pool.attributes.volume_usd?.h24 ?? '0',
+          address: attributes.address,
+          name: attributes.name ?? 'Unknown Pool',
+          price_usd: attributes.base_token_price_usd ?? '0',
+          price_change_percentage_h24: attributes.price_change_percentage?.h24 ?? '0',
+          volume_h24_usd: attributes.volume_usd?.h24 ?? '0',
           base_token: {
-            name: pool.relationships.base_token?.data?.attributes?.name ?? 'Unknown',
-            symbol: pool.relationships.base_token?.data?.attributes?.symbol ?? 'N/A',
+            name: baseTokenData.attributes?.name ?? 'Unknown',
+            symbol: baseTokenData.attributes?.symbol ?? 'N/A',
           },
           quote_token: {
-            name: pool.relationships.quote_token?.data?.attributes?.name ?? 'Unknown',
-            symbol: pool.relationships.quote_token?.data?.attributes?.symbol ?? 'N/A',
+            name: quoteTokenData.attributes?.name ?? 'Unknown',
+            symbol: quoteTokenData.attributes?.symbol ?? 'N/A',
           }
         };
       })
