@@ -1,67 +1,32 @@
-// Lokasi file: src/app/trending/page.tsx
+// Lokasi file: src/app/trending/page.tsx (VERSI DEBUGGING)
 "use client";
 
 import { useState, useEffect } from 'react';
 import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
-import { LoaderCircle, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react';
-
-// Interface tetap sama, ini sudah benar
-interface Token {
-  name: string;
-  symbol: string;
-}
-interface Pool {
-  id: string;
-  address: string;
-  name: string;
-  price_usd: string;
-  price_change_percentage_h24: string;
-  volume_h24_usd: string;
-  base_token: Token;
-  quote_token: Token;
-}
-
-// Helper format angka tetap sama
-const formatCurrency = (value: string | number) => {
-    const num = Number(value);
-    if (isNaN(num)) return '$0.00';
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 6 }).format(num);
-};
-const formatVolume = (value: string | number) => {
-    const num = Number(value);
-    if (isNaN(num)) return '$0';
-    if (num > 1_000_000) return `$${(num / 1_000_000).toFixed(2)}M`;
-    if (num > 1_000) return `$${(num / 1_000).toFixed(1)}K`;
-    return `$${num.toFixed(0)}`;
-};
+import { LoaderCircle, TrendingUp } from 'lucide-react';
 
 export default function TrendingPage() {
-  const [pools, setPools] = useState<Pool[]>([]);
+  const [pools, setPools] = useState<any[]>([]); // Gunakan any[] untuk debugging
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
+      setError(null);
       try {
         const response = await fetch('/api/trending/base');
         if (!response.ok) {
-          throw new Error('Failed to fetch trending data');
+          const errorText = await response.text();
+          throw new Error(`Failed to fetch: ${response.status} - ${errorText}`);
         }
         const data = await response.json();
-        // === PERBAIKAN PENTING: MENCEGAH DUPLIKASI ===
-        // Buat Set untuk melacak ID pool yang sudah ditambahkan
-        const uniquePools = new Map<string, Pool>();
-        if (data.pools && Array.isArray(data.pools)) {
-          data.pools.forEach((pool: Pool) => {
-            if (!uniquePools.has(pool.id)) {
-              uniquePools.set(pool.id, pool);
-            }
-          });
-        }
-        setPools(Array.from(uniquePools.values()));
-      } catch (error) {
-        console.error("Failed to fetch trending pools:", error);
+        console.log("RAW DATA FROM API:", data); // Log data mentah di console
+        setPools(data.pools || []);
+      } catch (err) {
+        console.error("Fetch Error:", err);
+        setError(err instanceof Error ? err.message : 'An unknown error occurred');
       } finally {
         setIsLoading(false);
       }
@@ -81,45 +46,30 @@ export default function TrendingPage() {
           </div>
         </div>
 
-        {isLoading ? (
+        {isLoading && (
           <div className="flex justify-center items-center h-64">
             <LoaderCircle className="animate-spin h-12 w-12 text-gold" />
           </div>
-        ) : (
-          <div className="space-y-3">
-            {pools.map((pool, index) => {
-              const priceChange = parseFloat(pool.price_change_percentage_h24);
-              const isPositive = priceChange >= 0;
-
-              return (
-                // Menggunakan pool.id sebagai key yang unik
-                <div key={pool.id} className="bg-neutral-800 p-4 rounded-xl border border-neutral-700 hover:border-gold/50 transition-all">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className="text-lg font-bold text-neutral-500 w-8">{index + 1}</span>
-                      <div className='ml-2'>
-                        {/* Menampilkan simbol dari base_token dan quote_token */}
-                        <p className="font-bold text-lg">{pool.base_token?.symbol ?? 'N/A'} / {pool.quote_token?.symbol ?? 'N/A'}</p>
-                        <p className="text-xs text-neutral-400">{pool.name}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-bold text-lg">{formatCurrency(pool.price_usd)}</p>
-                      <div className={`flex items-center justify-end gap-1 text-sm ${isPositive ? 'text-green-400' : 'text-red-400'}`}>
-                        {isPositive ? <ArrowUp size={14} /> : <ArrowDown size={14} />}
-                        {Math.abs(priceChange).toFixed(2)}%
-                      </div>
-                    </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-neutral-700 flex justify-between items-center text-sm">
-                      <p className="text-neutral-400">24h Volume:</p>
-                      <p className="font-bold">{formatVolume(pool.volume_h24_usd)}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
         )}
+        
+        {error && (
+            <div className="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-lg">
+                <h3 className="font-bold">An Error Occurred</h3>
+                <pre className="mt-2 text-xs whitespace-pre-wrap">{error}</pre>
+            </div>
+        )}
+
+        {/* ==== BAGIAN DEBUGGING UTAMA ==== */}
+        {/* Ini akan menampilkan seluruh data JSON mentah di layar */}
+        {!isLoading && !error && pools.length > 0 && (
+            <div className="bg-neutral-800 p-4 rounded-lg mt-4">
+                <h3 className="font-bold text-yellow-400 mb-2">-- RAW DATA DEBUG --</h3>
+                <pre className="text-xs text-white whitespace-pre-wrap">
+                    {JSON.stringify(pools, null, 2)}
+                </pre>
+            </div>
+        )}
+        
       </main>
       <Footer />
     </>
