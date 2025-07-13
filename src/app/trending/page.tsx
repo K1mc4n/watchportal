@@ -1,4 +1,4 @@
-// Lokasi file: src/app/trending/page.tsx (VERSI FINAL)
+// Lokasi file: src/app/trending/page.tsx (VERSI SUPER FINAL)
 "use client";
 
 import { useState, useEffect } from 'react';
@@ -6,10 +6,9 @@ import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
 import { LoaderCircle, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react';
 
-// Interface disederhanakan, kita tidak butuh Token lagi
 interface Pool {
   id: string;
-  name: string; // Ini akan menjadi sumber utama kita
+  name: string;
   price_usd: string;
   price_change_percentage_h24: string;
   volume_h24_usd: string;
@@ -37,7 +36,6 @@ export default function TrendingPage() {
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Kita tidak perlu mengubah API call, backend sudah bagus
         const response = await fetch('/api/trending/base');
         const data = await response.json();
         setPools(data.pools || []);
@@ -72,12 +70,13 @@ export default function TrendingPage() {
               const priceChange = parseFloat(pool.price_change_percentage_h24);
               const isPositive = priceChange >= 0;
 
-              // === TRIK CERDAS DI SINI ===
-              // Ekstrak simbol token dari `pool.name`
-              const pairName = pool.name.split(' ')[0] ?? 'N/A'; // Ambil bagian pertama, misal: "WETH/USDC"
-              const pairFee = pool.name.split(' ')[1] ?? ''; // Ambil bagian kedua, misal: "0.05%"
-              const finalPairName = `${pairName.split('/')[0]} / ${pairName.split('/')[1]}`;
-
+              // ===========================================
+              // ==== LOGIKA EKSTRAKSI PALING TANGGUH ====
+              // ===========================================
+              const parts = pool.name.split(' ');
+              const token1 = parts[0] ?? 'N/A';
+              const token2 = parts[1] ?? 'N/A'; // Akan menjadi 'undefined' jika tidak ada spasi
+              const fee = parts[2] ?? '';
 
               return (
                 <div key={pool.id} className="bg-neutral-800 p-4 rounded-xl border border-neutral-700 hover:border-gold/50 transition-all">
@@ -86,8 +85,8 @@ export default function TrendingPage() {
                       <span className="text-lg font-bold text-neutral-500 w-8">{index + 1}</span>
                       <div className='ml-2'>
                         {/* Tampilkan hasil ekstraksi kita */}
-                        <p className="font-bold text-lg">{finalPairName}</p>
-                        <p className="text-xs text-neutral-400">{pairFee}</p>
+                        <p className="font-bold text-lg">{token1} / {token2}</p>
+                        <p className="text-xs text-neutral-400">{fee}</p>
                       </div>
                     </div>
                     <div className="text-right">
