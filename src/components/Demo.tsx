@@ -44,10 +44,8 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
   const chains = ['All', 'Base', 'Optimism', 'Degen', 'Multi-chain', 'Arbitrum'];
 
   return (
-    // Kita tidak perlu div pembungkus tambahan di sini
     <>
       <Header />
-      {/* ==== PERUBAHAN 1: Pindahkan padding-bottom ke sini ==== */}
       <main className="mx-auto py-6 px-4 pb-28 max-w-2xl">
         <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400 mb-2">
           Watch Portal
@@ -56,8 +54,9 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
           The Farcaster App Store, supercharged.
         </p>
 
-        {/* Header yang menempel saat scroll, z-index lebih tinggi dari konten tapi lebih rendah dari footer */}
-        <div className="sticky top-[72px] z-30 pt-2 pb-4 bg-neutral-900/80 backdrop-blur-md -mx-4 px-4">
+        {/* ==== PERUBAHAN UTAMA DI SINI ==== */}
+        {/* Hapus kelas 'sticky', 'top-[72px]', dan 'z-20' */}
+        <div className="pt-2 pb-4">
             <input
                 type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search apps by name, tag, or chain..."
@@ -83,7 +82,6 @@ export default function ThemedFeed({ apps, isLoading }: ThemedFeedProps) {
         </div>
 
         <div>
-          {/* ==== PERUBAHAN 2: Kembalikan gaya gradien pada judul ==== */}
           <h2 className="text-2xl font-bold mb-4 px-2 text-transparent bg-clip-text bg-gradient-to-r from-gold to-brand-light">
             ✨ App Directory
           </h2>
