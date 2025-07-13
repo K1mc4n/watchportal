@@ -1,39 +1,86 @@
-// src/app/api/news/route.ts
+// Lokasi file: src/app/api/news/route.ts
 
 import { NextResponse } from 'next/server';
 
-// Cache hasil dari endpoint ini selama 1 jam (3600 detik)
-// untuk mengurangi panggilan ke NewsAPI dan mempercepat loading.
-export const revalidate = 3600;
+// Cache hasil ini selama 10 menit (600 detik)
+export const revalidate = 600;
+
+interface CustomArticle {
+  source: { id: string | null; name: string };
+  title: string;
+  description: string;
+  url: string;
+  urlToImage: string | null;
+  publishedAt: string;
+  content: string | null;
+}
 
 export async function GET() {
-  const apiKey = process.env.NEWS_API_KEY;
+  const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  
+  // =======================================================
+  // ==== PERUBAHAN DI SINI ====
+  // =======================================================
+  const chatId = '@Botscapital'; // Menggunakan username channel Anda
+  // =======================================================
 
-  if (!apiKey) {
-    return NextResponse.json({ error: 'News API key not configured' }, { status: 500 });
+  if (!botToken) {
+    return NextResponse.json({ error: 'Telegram Bot Token not configured' }, { status: 500 });
   }
 
-  // URL untuk mencari berita terkait crypto dan Farcaster dalam bahasa Inggris
-  const newsApiUrl = `https://newsapi.org/v2/everything?q=(crypto OR farcaster OR web3 OR nft OR blockchain)&language=en&sortBy=publishedAt&pageSize=20`;
+  // API URL Telegram untuk mendapatkan riwayat chat
+  const telegramApiUrl = `https://api.telegram.org/bot${botToken}/getChatHistory?chat_id=${chatId}&limit=20`;
 
   try {
-    const response = await fetch(newsApiUrl, {
-      headers: {
-        'X-Api-Key': apiKey, // NewsAPI menggunakan header 'X-Api-Key'
-      },
-    });
+    const response = await fetch(telegramApiUrl);
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.error('NewsAPI Error:', errorData);
-      return NextResponse.json({ error: 'Failed to fetch news from source' }, { status: response.status });
+      console.error('Telegram API Error:', errorData);
+      // Berikan pesan error yang lebih spesifik jika bot tidak bisa akses channel
+      if (errorData.description === "Bad Request: chat not found") {
+        return NextResponse.json({ error: 'Failed to fetch news: Chat not found. Make sure the bot is an admin in the channel.' }, { status: response.status });
+      }
+      return NextResponse.json({ error: 'Failed to fetch news from Telegram' }, { status: response.status });
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+
+    if (!data.ok || !data.result) {
+        console.warn("Telegram API response was not OK or had no result:", data);
+        return NextResponse.json({ articles: [] });
+    }
+
+    const articles: CustomArticle[] = data.result
+      .filter((update: any) => update.message && update.message.text)
+      .map((update: any) => {
+        const message = update.message;
+        const text: string = message.text || '';
+        
+        const urlMatch = text.match(/https?:\/\/[^\s]+/);
+        const url = urlMatch ? urlMatch[0] : `https://t.me/${chatId.replace('@', '')}/${message.message_id}`;
+
+        // Coba buat judul dan deskripsi yang lebih baik
+        const lines = text.split('\n').filter(line => line.trim() !== ''); // Hapus baris kosong
+        const title = lines[0]?.trim() || 'Telegram News Update';
+        const description = lines.slice(1, 3).join(' ').trim() || text.substring(0, 150);
+
+        return {
+          source: { id: 'telegram', name: message.chat.title || 'Telegram Channel' },
+          author: message.author_signature || 'Watch Portal Bot',
+          title: title,
+          description: description,
+          url: url,
+          urlToImage: null, // Tetap null untuk saat ini
+          publishedAt: new Date(message.date * 1000).toISOString(),
+          content: text,
+        };
+      });
+
+    return NextResponse.json({ articles });
 
   } catch (error) {
-    console.error('Internal Server Error fetching news:', error);
+    console.error('Internal Server Error fetching news from Telegram:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
