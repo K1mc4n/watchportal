@@ -1,4 +1,4 @@
-// src/components/ui/MiniAppCard.tsx
+// Lokasi file: src/components/ui/MiniAppCard.tsx
 
 import { MiniApp } from '~/lib/miniAppsData';
 
@@ -10,31 +10,22 @@ interface MiniAppCardProps {
 export const MiniAppCard = ({ app, onLaunch }: MiniAppCardProps) => {
   return (
     <div 
-      // --- SEMUA PERUBAHAN ADA DI SINI ---
-      className="
-        flex flex-col items-center text-center w-full h-full 
-        bg-neutral-800                             // 1. Latar belakang diubah menjadi abu-abu gelap
-        rounded-lg shadow-md overflow-hidden 
-        border border-transparent                 // 2. Border dibuat transparan secara default
-        p-2 cursor-pointer 
-        transition-all duration-200 ease-in-out   // 3. Tambahkan transisi halus untuk semua perubahan
-        hover:border-gold                         // 4. Saat di-hover, border menjadi emas
-        hover:scale-105                           // 5. Saat di-hover, kartu sedikit membesar
-        hover:shadow-lg hover:shadow-gold/10      // 6. Saat di-hover, tambahkan bayangan emas
-      "
+      className="group relative flex flex-col items-center justify-center text-center w-full aspect-square bg-neutral-800/60 backdrop-blur-sm rounded-2xl shadow-lg overflow-hidden border border-neutral-700 p-3 cursor-pointer transition-all duration-300 ease-in-out hover:border-gold/50 hover:-translate-y-1 hover:shadow-2xl hover:shadow-gold/10"
       onClick={() => onLaunch(app.url)}
     >
-      {/* Ikon Aplikasi */}
-      <img
-        className="w-12 h-12 rounded-lg object-cover mb-1"
-        src={app.iconUrl}
-        alt={`Icon for ${app.name}`}
-      />
+      <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 group-hover:animate-shine"></div>
       
-      {/* Nama Aplikasi */}
-      <p className="text-xs font-semibold text-gray-200 leading-tight">
-        {app.name}
-      </p>
+      <div className="relative z-10 flex flex-col items-center justify-center h-full">
+        <img
+          className="w-14 h-14 rounded-xl object-cover mb-2 shadow-md transition-transform duration-300 group-hover:scale-110"
+          src={app.iconUrl}
+          alt={`Icon for ${app.name}`}
+        />
+        <p className="text-sm font-bold text-neutral-100 leading-tight">
+          {app.name}
+        </p>
+        <p className="text-xs text-neutral-400 mt-1">{app.chain}</p>
+      </div>
     </div>
   );
 };
