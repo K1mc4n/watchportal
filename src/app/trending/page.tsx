@@ -5,7 +5,6 @@ import { useState, useEffect } from 'react';
 import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
 import { LoaderCircle, TrendingUp, ArrowDown, ArrowUp } from 'lucide-react';
-import Link from 'next/link';
 
 // Interface tetap sama, ini sudah benar
 interface Token {
@@ -46,8 +45,21 @@ export default function TrendingPage() {
       setIsLoading(true);
       try {
         const response = await fetch('/api/trending/base');
+        if (!response.ok) {
+          throw new Error('Failed to fetch trending data');
+        }
         const data = await response.json();
-        setPools(data.pools || []);
+        // === PERBAIKAN PENTING: MENCEGAH DUPLIKASI ===
+        // Buat Set untuk melacak ID pool yang sudah ditambahkan
+        const uniquePools = new Map<string, Pool>();
+        if (data.pools && Array.isArray(data.pools)) {
+          data.pools.forEach((pool: Pool) => {
+            if (!uniquePools.has(pool.id)) {
+              uniquePools.set(pool.id, pool);
+            }
+          });
+        }
+        setPools(Array.from(uniquePools.values()));
       } catch (error) {
         console.error("Failed to fetch trending pools:", error);
       } finally {
@@ -80,15 +92,14 @@ export default function TrendingPage() {
               const isPositive = priceChange >= 0;
 
               return (
+                // Menggunakan pool.id sebagai key yang unik
                 <div key={pool.id} className="bg-neutral-800 p-4 rounded-xl border border-neutral-700 hover:border-gold/50 transition-all">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <span className="text-lg font-bold text-neutral-500 w-8">{index + 1}</span>
                       <div className='ml-2'>
-                        {/* ==== PERBAIKAN UTAMA DI SINI ==== */}
                         {/* Menampilkan simbol dari base_token dan quote_token */}
-                        <p className="font-bold text-lg">{pool.base_token.symbol} / {pool.quote_token.symbol}</p>
-                        {/* Menampilkan nama pool yang lebih deskriptif di bawahnya */}
+                        <p className="font-bold text-lg">{pool.base_token?.symbol ?? 'N/A'} / {pool.quote_token?.symbol ?? 'N/A'}</p>
                         <p className="text-xs text-neutral-400">{pool.name}</p>
                       </div>
                     </div>
