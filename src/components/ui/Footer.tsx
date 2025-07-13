@@ -45,7 +45,9 @@ export function Footer() {
     <>
       {isChatOpen && <ChatWindow onClose={handleCloseChat} />}
 
-      <footer className="fixed bottom-0 left-0 right-0 bg-neutral-900/80 backdrop-blur-sm border-t border-neutral-700/50 shadow-lg">
+      {/* ==== PERBAIKAN UTAMA DI SINI ==== */}
+      {/* Menambahkan z-index yang sangat tinggi (z-50) */}
+      <footer className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-900/80 backdrop-blur-sm border-t border-neutral-700/50 shadow-lg">
         <div className="flex justify-around max-w-lg mx-auto px-1">
           <NavItem href="/" icon={Home} label="Home" isActive={activeTab === 'home'} />
           <NavItem href="/submit" icon={PlusSquare} label="Submit" isActive={activeTab === 'submit'} />
