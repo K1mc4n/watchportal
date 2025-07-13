@@ -1,7 +1,8 @@
 // Lokasi file: src/components/ui/Header.tsx
+
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useMiniApp } from "@neynar/react";
 import Image from 'next/image';
 import Link from 'next/link';
@@ -12,8 +13,25 @@ export function Header() {
   const { context, actions } = useMiniApp();
   const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
   const loggedInUser = context?.user;
-  
   const [totalPoints, setTotalPoints] = useState<number | null>(null);
+
+  // --- LOGIKA BARU UNTUK MENDETEKSI SCROLL ---
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleScroll = useCallback(() => {
+    const offset = window.scrollY;
+    // Aktifkan efek setelah scroll sejauh 10 piksel
+    setIsScrolled(offset > 10);
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Cleanup listener untuk mencegah memory leak
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
+  // --- AKHIR LOGIKA SCROLL ---
 
   useEffect(() => {
     if (loggedInUser?.fid) {
@@ -43,7 +61,8 @@ export function Header() {
   };
 
   return (
-    <div className="header-sticky">
+    // Terapkan kelas secara dinamis berdasarkan state isScrolled
+    <div className={`header-sticky ${isScrolled ? 'scrolled-header' : ''}`}>
       <div className="flex h-16 items-center justify-between px-2 gap-2 max-w-2xl mx-auto">
         {/* Kontainer Kiri */}
         <div className="flex items-center gap-3">
