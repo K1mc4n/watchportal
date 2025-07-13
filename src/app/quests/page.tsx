@@ -8,9 +8,10 @@ import { useMiniApp } from '@neynar/react';
 import { Header } from '~/components/ui/Header';
 import { Footer } from '~/components/ui/Footer';
 import { Button } from '~/components/ui/Button';
-// --- 1. Impor ikon UserPlus ---
-import { LoaderCircle, CheckCircle, PartyPopper, UserPlus } from 'lucide-react';
+// Hapus UserPlus, kita tidak menggunakannya lagi
+import { LoaderCircle, CheckCircle, PartyPopper } from 'lucide-react';
 
+// Interface dan definisi lainnya tidak berubah
 interface Quest {
   id: number;
   title: string;
@@ -26,7 +27,7 @@ interface Completion {
 }
 
 export default function QuestsPage() {
-  const { context, actions } = useMiniApp();
+  const { context } = useMiniApp(); // Kita tidak butuh 'actions' di sini lagi
   const userFid = context?.user?.fid;
 
   const [quests, setQuests] = useState<Quest[]>([]);
@@ -59,43 +60,13 @@ export default function QuestsPage() {
   useEffect(() => {
     fetchQuestData();
   }, [fetchQuestData]);
-
-  // --- 2. Buat fungsi handler baru untuk aksi Follow ---
-  const handleFollowAndVerify = async (quest: Quest) => {
-    if (!userFid || !actions?.followUser) {
-      alert("This feature is only available in a Farcaster client.");
-      return;
-    }
-
-    const targetFidStr = quest.verification_logic.split(':')[1];
-    const targetFid = parseInt(targetFidStr);
-
-    if (isNaN(targetFid)) {
-      alert("Invalid quest configuration.");
-      return;
-    }
-
-    setVerifyingQuestId(quest.id);
-    try {
-      // Buka UI native Farcaster untuk follow
-      await actions.followUser({ fid: targetFid });
-      
-      // Beri jeda 1 detik untuk API Farcaster memperbarui status
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Langsung coba verifikasi setelahnya
-      await handleVerify(quest.id);
-
-    } catch (error) {
-      console.error("Follow action failed:", error);
-      // Pengguna mungkin membatalkan, jadi jangan tampilkan error yang mengganggu
-    } finally {
-      setVerifyingQuestId(null);
-    }
-  };
-
+  
+  // Fungsi handleVerify tidak perlu diubah, ini sudah benar
   const handleVerify = async (questId: number) => {
-    if (!userFid) return;
+    if (!userFid) {
+      alert("Please login to complete quests.");
+      return;
+    }
     setVerifyingQuestId(questId);
     try {
       const response = await fetch('/api/quests/verify', {
@@ -117,29 +88,39 @@ export default function QuestsPage() {
     }
   };
 
-  const getQuestStatus = (quest: Quest): 'done' | 'available' => {
-    const completion = completions.find(c => c.quest_id === quest.id);
-    return completion ? 'done' : 'available';
+  const getQuestStatus = (quest: Quest): 'done' | 'available' | 'cooldown' => {
+      const completion = completions.find(c => c.quest_id === quest.id);
+      if (!completion) return 'available';
+      if (!quest.is_recurring) return 'done';
+      if (quest.verification_logic === 'daily_checkin') {
+        const now = new Date();
+        const lastCompletion = new Date(completion.completed_at);
+        if (lastCompletion.getUTCFullYear() === now.getUTCFullYear() && lastCompletion.getUTCMonth() === now.getUTCMonth() && lastCompletion.getUTCDate() === now.getUTCDate()) {
+          return 'cooldown';
+        }
+      }
+      return 'available';
   };
 
-  // --- 3. Perbarui logika render tombol ---
+  // --- KEMBALIKAN LOGIKA RENDER KE VERSI SEBELUMNYA ---
   const renderQuestAction = (quest: Quest) => {
     const isVerifying = verifyingQuestId === quest.id;
-
-    if (quest.verification_logic.startsWith('follow_fid:')) {
-      return (
-        <Button onClick={() => handleFollowAndVerify(quest)} isLoading={isVerifying}>
-          <UserPlus className="w-4 h-4 mr-2" /> Follow
-        </Button>
-      );
-    }
 
     if (quest.verification_logic === 'complete_weekly_quiz') {
       return <Link href="/quiz"><Button isLoading={isVerifying}>Start Quiz</Button></Link>;
     }
     
-    if (quest.verification_logic.startsWith('hold_token:') || quest.verification_logic.startsWith('hold_nft:')) {
-      return <Button onClick={() => handleVerify(quest.id)} isLoading={isVerifying}>Verify</Button>;
+    // Semua quest lain yang bisa diverifikasi (follow, hold) akan menggunakan tombol "Verify" ini
+    if (
+        quest.verification_logic.startsWith('follow_fid:') ||
+        quest.verification_logic.startsWith('hold_token:') ||
+        quest.verification_logic.startsWith('hold_nft:')
+    ) {
+      return (
+        <Button onClick={() => handleVerify(quest.id)} isLoading={isVerifying}>
+          Verify
+        </Button>
+      );
     }
     
     return <Button disabled>Start</Button>;
@@ -170,10 +151,10 @@ export default function QuestsPage() {
                         <p className="text-sm font-bold text-gold mt-2">{quest.points} Points</p>
                       </div>
                       <div className="flex-shrink-0 ml-4">
-                        {status === 'done' ? (
+                        {(status === 'done' || status === 'cooldown') ? (
                           <div className="flex items-center gap-2 text-green-400 font-semibold px-4">
                             <CheckCircle size={20} />
-                            <span>Done</span>
+                            <span>{status === 'cooldown' ? 'Claimed' : 'Done'}</span>
                           </div>
                         ) : (
                           renderQuestAction(quest)
