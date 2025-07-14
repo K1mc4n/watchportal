@@ -2,7 +2,6 @@
 'use client';
 
 import { useState } from 'react';
-// Impor ikon baru: Grid
 import { Home, Grid, MessageCircle, type LucideIcon } from 'lucide-react'; 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -33,10 +32,9 @@ export function Footer() {
   const handleToggleChat = () => setIsChatOpen(!isChatOpen);
   const handleCloseChat = () => setIsChatOpen(false);
 
-  // --- PERUBAHAN DI SINI ---
   const getActiveTab = (): 'home' | 'apps' | 'chat' | null => {
     if (isChatOpen) return 'chat';
-    if (pathname.startsWith('/apps')) return 'apps'; // Tambahkan kondisi untuk halaman apps
+    if (pathname.startsWith('/apps')) return 'apps';
     if (pathname === '/') return 'home'; 
     return null;
   };
@@ -48,7 +46,6 @@ export function Footer() {
       {isChatOpen && <ChatWindow onClose={handleCloseChat} />}
 
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-900/80 backdrop-blur-sm border-t border-neutral-700/50 shadow-lg">
-        {/* --- PERUBAHAN DI SINI --- */}
         <div className="flex justify-around max-w-lg mx-auto px-1">
           <NavItem href="/" icon={Home} label="Home" isActive={activeTab === 'home'} />
           <NavItem href="/apps" icon={Grid} label="Apps" isActive={activeTab === 'apps'} />
