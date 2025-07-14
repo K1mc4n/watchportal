@@ -2,8 +2,8 @@
 'use client';
 
 import { useState } from 'react';
-// Hapus 'PlusSquare' dari impor karena tidak digunakan lagi
-import { Home, MessageCircle, type LucideIcon } from 'lucide-react'; 
+// Impor ikon baru: Grid
+import { Home, Grid, MessageCircle, type LucideIcon } from 'lucide-react'; 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChatWindow } from '~/components/ui/ChatWindow';
@@ -33,9 +33,10 @@ export function Footer() {
   const handleToggleChat = () => setIsChatOpen(!isChatOpen);
   const handleCloseChat = () => setIsChatOpen(false);
 
-  // Logika untuk tab aktif disederhanakan, tidak ada lagi 'submit'
-  const getActiveTab = (): 'home' | 'chat' | null => {
+  // --- PERUBAHAN DI SINI ---
+  const getActiveTab = (): 'home' | 'apps' | 'chat' | null => {
     if (isChatOpen) return 'chat';
+    if (pathname.startsWith('/apps')) return 'apps'; // Tambahkan kondisi untuk halaman apps
     if (pathname === '/') return 'home'; 
     return null;
   };
@@ -47,9 +48,10 @@ export function Footer() {
       {isChatOpen && <ChatWindow onClose={handleCloseChat} />}
 
       <footer className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-900/80 backdrop-blur-sm border-t border-neutral-700/50 shadow-lg">
-        {/* Konten footer kini hanya memiliki dua tombol */}
+        {/* --- PERUBAHAN DI SINI --- */}
         <div className="flex justify-around max-w-lg mx-auto px-1">
           <NavItem href="/" icon={Home} label="Home" isActive={activeTab === 'home'} />
+          <NavItem href="/apps" icon={Grid} label="Apps" isActive={activeTab === 'apps'} />
           <ChatButton onClick={handleToggleChat} isActive={activeTab === 'chat'} />
         </div>
       </footer>
