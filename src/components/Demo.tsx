@@ -13,13 +13,13 @@ const sponsors = [
     name: "Poidh", 
     logoUrl: "/images/poidh-logo.png",
     description: "On‑chain bounty dApp where users create, share, claim simple crypto challenges.",
-    learnMoreLink: "https://poidh.xyz" 
+    learnMoreLink: "https://farcaster.xyz/miniapps/E4kUegtA0DOk/poidh" 
   },
   { 
     name: "Scout Games", 
     logoUrl: "/images/scout-games-logo.png",
     description: "Fantasy game where you collect developers, earn rewards, and support open-source.",
-    learnMoreLink: "https://scoutgame.xyz/"
+    learnMoreLink: "https://farcaster.xyz/miniapps/JX-BIkAO-oMv/scout-game"
   },
   { 
     name: "Seconds", 
