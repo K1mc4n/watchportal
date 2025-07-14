@@ -1,9 +1,9 @@
 // src/app/page.tsx
-
 import type { Metadata } from 'next';
 import { APP_NAME, APP_DESCRIPTION, APP_OG_IMAGE_URL } from '~/lib/constants';
 import { getMiniAppEmbedMetadata } from '~/lib/utils';
-import HomeClient from '~/components/HomeClient'; // <-- Impor komponen wrapper baru
+// Impor Demo.tsx, bukan HomeClient
+import ThemedFeed from '~/components/Demo';
 
 export const revalidate = 300; 
 export const dynamic = 'force-dynamic';
@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Halaman utama sekarang hanya merender komponen HomeClient.
+// Halaman utama sekarang hanya merender ThemedFeed (sebelumnya Demo)
 export default function Home() {
-  return <HomeClient />;
+  return <ThemedFeed />;
 }
