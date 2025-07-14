@@ -2,8 +2,7 @@
 import type { Metadata } from 'next';
 import { APP_NAME, APP_DESCRIPTION, APP_OG_IMAGE_URL } from '~/lib/constants';
 import { getMiniAppEmbedMetadata } from '~/lib/utils';
-// Impor Demo.tsx, bukan HomeClient
-import ThemedFeed from '~/components/Demo';
+import ThemedFeed from '~/components/Demo'; // Langsung impor Demo.tsx
 
 export const revalidate = 300; 
 export const dynamic = 'force-dynamic';
@@ -23,7 +22,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-// Halaman utama sekarang hanya merender ThemedFeed (sebelumnya Demo)
 export default function Home() {
   return <ThemedFeed />;
 }
