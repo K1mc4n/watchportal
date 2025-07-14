@@ -15,18 +15,15 @@ export default function AppsPage() {
   const [apps, setApps] = useState<MiniApp[]>(miniAppsData);
   const [isLoading, setIsLoading] = useState(true);
   
-  // State untuk filtering dan search
   const [selectedChain, setSelectedChain] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
 
-  // Fungsi untuk membuka aplikasi
   const handleLaunchApp = (url: string) => {
     if (actions.openUrl) actions.openUrl(url);
     else window.open(url, '_blank');
   };
 
-  // Logika untuk fetch data aplikasi dari komunitas
   useEffect(() => {
     const fetchFeedData = async () => {
       setIsLoading(true);
@@ -48,7 +45,6 @@ export default function AppsPage() {
     fetchFeedData();
   }, []);
 
-  // Logika untuk memfilter aplikasi berdasarkan pencarian dan chain
   const filteredApps = useMemo(() => {
     return apps.filter(app => {
       const chainMatch = selectedChain === 'All' || app.chain === selectedChain;
@@ -75,7 +71,6 @@ export default function AppsPage() {
           Discover new and popular Farcaster Mini Apps and crypto tools.
         </p>
         
-        {/* Kontrol Search dan Filter */}
         <div className="pt-2 pb-4">
             <input
                 type="text" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)}
@@ -95,7 +90,6 @@ export default function AppsPage() {
             </div>
         </div>
         
-        {/* Grid Aplikasi */}
         <div className="mt-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {filteredApps.map((app) => (
@@ -112,4 +106,4 @@ export default function AppsPage() {
       <Footer />
     </>
   );
-                }
+}
