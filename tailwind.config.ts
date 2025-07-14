@@ -13,6 +13,8 @@ export default {
   	extend: {
   		colors: {
         'gold': '#E6B325',
+        // --- TAMBAHKAN WARNA INI ---
+        'neon-pink': '#f000b8',
         'brand': {
             'light': '#F0C43E',
             'dark': '#C89B1C'
@@ -38,6 +40,11 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
+      // --- TAMBAHKAN BAGIAN INI UNTUK EFEK GLOW ---
+      boxShadow: {
+        'neon-pink': '0 0 5px theme(colors.neon-pink), 0 0 10px theme(colors.neon-pink / 0.8), 0 0 15px theme(colors.neon-pink / 0.6)',
+      },
+      // ------------------------------------------
       keyframes: {
         "shine-effect": {
           "0%": { transform: "translateX(-100%) translateY(-100%) rotate(30deg)" },
