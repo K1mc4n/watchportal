@@ -13,13 +13,13 @@ export default {
   	extend: {
   		colors: {
         'gold': '#E6B325',
-        // --- TAMBAHKAN WARNA INI ---
-        'neon-pink': '#f000b8',
+        // 'neon-pink': '#f000b8', // Kita bisa hapus atau abaikan ini
         'brand': {
             'light': '#F0C43E',
             'dark': '#C89B1C'
         },
         'neutral': {
+          // ... (definisi neutral tetap sama)
           '50': '#f8f8f8',
           '100': '#e5e5e5',
           '200': '#cccccc',
@@ -40,11 +40,11 @@ export default {
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
   		},
-      // --- TAMBAHKAN BAGIAN INI UNTUK EFEK GLOW ---
+      // --- PERUBAHAN DI SINI: Ganti efek neon ---
       boxShadow: {
-        'neon-pink': '0 0 5px theme(colors.neon-pink), 0 0 10px theme(colors.neon-pink / 0.8), 0 0 15px theme(colors.neon-pink / 0.6)',
+        'gold-glow': '0 0 5px theme(colors.gold), 0 0 10px theme(colors.gold / 0.6), 0 0 15px theme(colors.gold / 0.4)',
       },
-      // ------------------------------------------
+      // ----------------------------------------
       keyframes: {
         "shine-effect": {
           "0%": { transform: "translateX(-100%) translateY(-100%) rotate(30deg)" },
