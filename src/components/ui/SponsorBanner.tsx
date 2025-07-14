@@ -10,14 +10,16 @@ interface SponsorBannerProps {
 
 export const SponsorBanner = ({ name, logoUrl, description, learnMoreLink }: SponsorBannerProps) => {
   return (
-    <div className="relative p-1 rounded-xl bg-black shadow-neon-pink h-full">
+    // Mengganti efek neon dengan efek glow emas
+    <div className="relative p-px rounded-xl bg-black shadow-gold-glow">
       <a 
         href={learnMoreLink} 
         target="_blank" 
         rel="noopener noreferrer" 
-        className="relative flex items-center gap-4 p-4 rounded-lg bg-black border border-neon-pink/50 h-full"
+        className="relative flex items-center gap-3 p-3 rounded-lg bg-black border border-gold/50 h-full"
       >
-        <div className="flex-shrink-0 w-20 h-20 bg-white rounded-md flex items-center justify-center p-1">
+        {/* Ukuran logo diperkecil */}
+        <div className="flex-shrink-0 w-14 h-14 bg-white rounded-md flex items-center justify-center p-1">
           <img 
             src={logoUrl} 
             alt={`${name} logo`} 
@@ -25,9 +27,10 @@ export const SponsorBanner = ({ name, logoUrl, description, learnMoreLink }: Spo
           />
         </div>
         <div className="flex-grow">
-          <p className="text-white font-medium">
+          {/* Ukuran font diperkecil */}
+          <p className="text-white text-sm font-medium">
             {description}{' '}
-            <span className="font-bold text-neon-pink uppercase hover:underline">
+            <span className="font-bold text-gold uppercase hover:underline">
               Learn More
             </span>
           </p>
