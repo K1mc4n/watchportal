@@ -52,7 +52,7 @@ export default function ThemedFeed() {
 
         {/* Seksi Video YouTube */}
         <div className="my-8">
-            <h2 className="text-lg font-bold text-center mb-4 text-white">Featured Project: $SECONDS</h2>
+            <h2 className="text-lg font-bold text-center mb-4 text-white">$SECONDS Introduction!</h2>
             <YouTubeEmbed videoId={youtubeVideoId} title="About $SECONDS Token" />
         </div>
         
