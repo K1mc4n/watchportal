@@ -5,7 +5,6 @@ import { Header } from "./ui/Header";
 import { Footer } from "./ui/Footer";
 import { ActionCard } from "./ui/ActionCard"; 
 import { SponsorBanner } from "./ui/SponsorBanner";
-// Impor komponen video yang baru
 import { YouTubeEmbed } from './ui/YouTubeEmbed';
 import { Newspaper, ListChecks, Swords, PlusSquare } from 'lucide-react';
 
@@ -37,8 +36,8 @@ const sponsors = [
 ];
 
 export default function ThemedFeed() {
-  // ID Video diperbarui sesuai permintaan
-  const youtubeVideoId = 'KB3-3LPihA8SC2ob'; 
+  // === PERUBAHAN DI SINI: ID Video diperbarui dengan yang benar ===
+  const youtubeVideoId = 'tm0zAKqtkjg'; 
 
   return (
     <>
