@@ -8,12 +8,13 @@ import { SponsorBanner } from "./ui/SponsorBanner";
 import { YouTubeEmbed } from './ui/YouTubeEmbed';
 import { Newspaper, ListChecks, Swords, PlusSquare } from 'lucide-react';
 
+// === PERUBAHAN UTAMA DI SINI: URUTAN SPONSOR DIUBAH ===
 const sponsors = [
   { 
-    name: "Poidh", 
-    logoUrl: "/images/poidh-logo.png",
-    description: "On‑chain bounty dApp where users create, share, claim simple crypto challenges.",
-    learnMoreLink: "https://farcaster.xyz/miniapps/E4kUegtA0DOk/poidh" 
+    name: "Seconds", 
+    logoUrl: "/images/seconds-logo.png",
+    description: "$SECONDS is an innovative, up-only token technology powered by Proof of Time. The more $SECONDS you hold, the more $SECONDS you can mint.",
+    learnMoreLink: "https://farcaster.xyz/miniapps/6exyQocUa5yy/seconds"
   },
   { 
     name: "Scout Games", 
@@ -22,21 +23,20 @@ const sponsors = [
     learnMoreLink: "https://farcaster.xyz/miniapps/JX-BIkAO-oMv/scout-game"
   },
   { 
-    name: "Seconds", 
-    logoUrl: "/images/seconds-logo.png",
-    description: "$SECONDS is an innovative, up-only token technology powered by Proof of Time. The more $SECONDS you hold, the more $SECONDS you can mint.",
-    learnMoreLink: "https://farcaster.xyz/miniapps/6exyQocUa5yy/seconds"
-  },
-  { 
     name: "Calendar3", 
     logoUrl: "/images/calendar3-logo.png",
     description: "Calendar3 mini‑app: launchpad for founders and developers to schedule precise crypto launches.",
     learnMoreLink: "https://farcaster.xyz/miniapps/VWJYBgehaDcZ/calendar3"
   },
+  { 
+    name: "Poidh", 
+    logoUrl: "/images/poidh-logo.png",
+    description: "On‑chain bounty dApp where users create, share, claim simple crypto challenges.",
+    learnMoreLink: "https://farcaster.xyz/miniapps/E4kUegtA0DOk/poidh" 
+  },
 ];
 
 export default function ThemedFeed() {
-  // === PERUBAHAN DI SINI: ID Video diperbarui dengan yang benar ===
   const youtubeVideoId = 'tm0zAKqtkjg'; 
 
   return (
@@ -52,7 +52,7 @@ export default function ThemedFeed() {
 
         {/* Seksi Video YouTube */}
         <div className="my-8">
-            <h2 className="text-lg font-bold text-center mb-4 text-white">$SECONDS Introduction!</h2>
+            <h2 className="text-lg font-bold text-center mb-4 text-white">Featured Project: $SECONDS</h2>
             <YouTubeEmbed videoId={youtubeVideoId} title="About $SECONDS Token" />
         </div>
         
@@ -64,6 +64,7 @@ export default function ThemedFeed() {
             <ActionCard href="/submit" icon={PlusSquare} title="Submit App" description="Share your tool" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
         </div>
 
+        {/* Seksi sponsor akan dirender sesuai urutan baru di atas */}
         <div className="my-10 grid grid-cols-1 md:grid-cols-2 gap-4">
           {sponsors.map(sponsor => (
             <SponsorBanner 
