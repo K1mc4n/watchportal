@@ -8,7 +8,6 @@ import { SponsorBanner } from "./ui/SponsorBanner";
 import { YouTubeEmbed } from './ui/YouTubeEmbed';
 import { Newspaper, ListChecks, Swords, PlusSquare } from 'lucide-react';
 
-// === PERUBAHAN UTAMA DI SINI: URUTAN SPONSOR DIUBAH ===
 const sponsors = [
   { 
     name: "Seconds", 
@@ -43,8 +42,14 @@ export default function ThemedFeed() {
     <>
       <Header />
       <main className="mx-auto py-6 px-4 pb-32 max-w-2xl">
-        <h1 className="text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400 mb-2">
-          Watch Portal
+        {/* === PERUBAHAN JUDUL ADA DI SINI === */}
+        <h1 className="text-4xl font-extrabold text-center mb-2">
+            <span className="text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400">
+                Watch{' '}
+            </span>
+            <span className="text-gold">
+                Portal
+            </span>
         </h1>
         <p className="text-center text-neutral-400 mb-8">
           The Farcaster App Store, supercharged.
@@ -64,7 +69,6 @@ export default function ThemedFeed() {
             <ActionCard href="/submit" icon={PlusSquare} title="Submit App" description="Share your tool" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
         </div>
 
-        {/* Seksi sponsor akan dirender sesuai urutan baru di atas */}
         <div className="my-10 grid grid-cols-1 md:grid-cols-2 gap-4">
           {sponsors.map(sponsor => (
             <SponsorBanner 
