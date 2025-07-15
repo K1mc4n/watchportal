@@ -5,10 +5,10 @@ import { Header } from "./ui/Header";
 import { Footer } from "./ui/Footer";
 import { ActionCard } from "./ui/ActionCard"; 
 import { SponsorBanner } from "./ui/SponsorBanner";
-// Ikon AppWindow sudah tidak diperlukan lagi
+// Impor komponen video yang baru
+import { YouTubeEmbed } from './ui/YouTubeEmbed';
 import { Newspaper, ListChecks, Swords, PlusSquare } from 'lucide-react';
 
-// Data sponsor tetap sama
 const sponsors = [
   { 
     name: "Poidh", 
@@ -37,6 +37,9 @@ const sponsors = [
 ];
 
 export default function ThemedFeed() {
+  // ID Video diperbarui sesuai permintaan
+  const youtubeVideoId = 'KB3-3LPihA8SC2ob'; 
+
   return (
     <>
       <Header />
@@ -47,10 +50,15 @@ export default function ThemedFeed() {
         <p className="text-center text-neutral-400 mb-8">
           The Farcaster App Store, supercharged.
         </p>
+
+        {/* Seksi Video YouTube */}
+        <div className="my-8">
+            <h2 className="text-lg font-bold text-center mb-4 text-white">Featured Project: $SECONDS</h2>
+            <YouTubeEmbed videoId={youtubeVideoId} title="About $SECONDS Token" />
+        </div>
         
-        {/* === PERUBAHAN UTAMA DI SINI === */}
+        {/* Kartu aksi yang tersisa */}
         <div className="my-8 grid grid-cols-2 gap-4">
-            {/* Kartu App Directory telah dihapus */}
             <ActionCard href="/news" icon={Newspaper} title="Web3 News" description="Stay updated" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
             <ActionCard href="/quests" icon={ListChecks} title="Quests" description="Earn points" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
             <ActionCard href="/quiz" icon={Swords} title="Challenge" description="Test knowledge" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
