@@ -5,9 +5,10 @@ import { Header } from "./ui/Header";
 import { Footer } from "./ui/Footer";
 import { ActionCard } from "./ui/ActionCard"; 
 import { SponsorBanner } from "./ui/SponsorBanner";
-import { Newspaper, ListChecks, Swords, AppWindow, PlusSquare } from 'lucide-react';
+// Ikon AppWindow sudah tidak diperlukan lagi
+import { Newspaper, ListChecks, Swords, PlusSquare } from 'lucide-react';
 
-// --- DATA SPONSOR DENGAN DETAIL DARI ANDA ---
+// Data sponsor tetap sama
 const sponsors = [
   { 
     name: "Poidh", 
@@ -34,7 +35,6 @@ const sponsors = [
     learnMoreLink: "https://farcaster.xyz/miniapps/VWJYBgehaDcZ/calendar3"
   },
 ];
-// -----------------------------------------------------------
 
 export default function ThemedFeed() {
   return (
@@ -48,8 +48,9 @@ export default function ThemedFeed() {
           The Farcaster App Store, supercharged.
         </p>
         
+        {/* === PERUBAHAN UTAMA DI SINI === */}
         <div className="my-8 grid grid-cols-2 gap-4">
-            <ActionCard href="/apps" icon={AppWindow} title="App Directory" description="Browse all apps" className="col-span-2 bg-gradient-to-br from-gold/20 to-neutral-800 border-gold/50 hover:bg-gold/10" />
+            {/* Kartu App Directory telah dihapus */}
             <ActionCard href="/news" icon={Newspaper} title="Web3 News" description="Stay updated" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
             <ActionCard href="/quests" icon={ListChecks} title="Quests" description="Earn points" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
             <ActionCard href="/quiz" icon={Swords} title="Challenge" description="Test knowledge" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />
