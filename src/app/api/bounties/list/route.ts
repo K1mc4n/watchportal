@@ -2,10 +2,21 @@
 
 import { NextResponse } from 'next/server';
 import { supabase } from '~/lib/supabase';
-import { getFrameMetadata } from '@coinbase/onchainkit';
 
 // Cache hasil ini selama 5 menit
 export const revalidate = 300;
+
+/**
+ * Fungsi sederhana untuk mengekstrak konten dari meta tag HTML.
+ * @param html Teks HTML dari halaman.
+ * @param property Nama properti meta tag (misalnya, 'fc:frame:image').
+ * @returns Konten dari meta tag atau string kosong jika tidak ditemukan.
+ */
+function extractMetaTag(html: string, property: string): string {
+  const regex = new RegExp(`<meta\\s+property="([^"]*${property}[^"]*)"\\s+content="([^"]*)"`);
+  const match = html.match(regex);
+  return match && match[2] ? match[2] : '';
+}
 
 export async function GET() {
   try {
@@ -20,23 +31,28 @@ export async function GET() {
       throw supabaseError;
     }
 
-    // 2. Untuk setiap URL, ambil metadata Farcaster Frame-nya
+    // 2. Untuk setiap URL, ambil metadata Farcaster Frame-nya secara manual
     const bountyDetailsPromises = approvedSubmissions.map(async (submission) => {
       try {
-        const metadata = await getFrameMetadata(submission.url);
-        // Kita ambil data yang relevan dari metadata frame
-        const frameImage = metadata.frameInfo?.image.src || '';
-        const frameTitle = metadata.frameInfo?.title || 'Bounty';
+        const response = await fetch(submission.url);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch URL: ${response.statusText}`);
+        }
+        const html = await response.text();
+
+        // Ekstrak informasi yang kita butuhkan dari meta tag
+        const imageUrl = extractMetaTag(html, 'fc:frame:image');
+        const title = extractMetaTag(html, 'og:title'); // Judul biasanya ada di og:title
 
         return {
           id: submission.id,
           url: submission.url,
-          title: frameTitle,
-          imageUrl: frameImage,
+          title: title || 'Bounty', // Fallback jika judul tidak ditemukan
+          imageUrl: imageUrl,
         };
       } catch (e) {
         console.error(`Failed to fetch metadata for ${submission.url}`, e);
-        // Jika gagal, kembalikan data dasar agar tidak merusak seluruh daftar
+        // Jika gagal, kembalikan data dasar
         return {
           id: submission.id,
           url: submission.url,
