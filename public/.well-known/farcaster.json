@@ -14,7 +14,5 @@
     "splashImageUrl": "https://watchportal.vercel.app/splash.png",
     "splashBackgroundColor": "#111111",
     "webhookUrl": "https://watchportal.vercel.app/api/webhook"
- "baseBuilder": {
-    "allowedAddresses": ["0x01Eb409F38af4c4B25C16845bDF65dcff8F06668"
   }
-  }
+}
