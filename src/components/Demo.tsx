@@ -5,7 +5,7 @@ import { Header } from "./ui/Header";
 import { Footer } from "./ui/Footer";
 import { ActionCard } from "./ui/ActionCard"; 
 import { SponsorBanner } from "./ui/SponsorBanner";
-import { YouTubeEmbed } from './ui/YouTubeEmbed';
+        
 // Impor ikon-ikon yang dibutuhkan, termasuk Trophy untuk bounty
 import { Newspaper, ListChecks, Swords, PlusSquare, Trophy } from 'lucide-react';
 
@@ -37,7 +37,7 @@ const sponsors = [
 ];
 
 export default function ThemedFeed() {
-  const youtubeVideoId = 'tm0zAKqtkjg'; 
+  // ...existing code...
 
   return (
     <>
@@ -55,11 +55,7 @@ export default function ThemedFeed() {
           The Farcaster App Store, supercharged.
         </p>
 
-        {/* Seksi Video YouTube */}
-        <div className="my-8">
-            <h2 className="text-lg font-bold text-center mb-4 text-white">Featured Project: $SECONDS</h2>
-            <YouTubeEmbed videoId={youtubeVideoId} title="About $SECONDS Token" />
-        </div>
+    // ...existing code...
         
         {/* === PERUBAHAN DI SINI: TATA LETAK GRID DISESUAIKAN === */}
         <div className="my-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
