@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
   try {
     // Kirim respons sukses ke frontend
       // Kode supabase dihapus, sesuaikan dengan data dummy atau kosong
-    return NextResponse.json({ points: data });
+  return NextResponse.json({ points: 0 });
 
   } catch (err) {
     console.error(`[API Points] ❌ CATCH BLOCK - An unexpected error occurred while fetching points for FID ${fidAsInt}.`, err);

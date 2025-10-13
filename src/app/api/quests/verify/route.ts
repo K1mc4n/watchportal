@@ -1,7 +1,7 @@
 // Lokasi file: src/app/api/quests/verify/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '~/lib/supabase';
+// Supabase dihapus
 import { getNeynarClient } from '~/lib/neynar';
 import { type Address } from 'viem';
 import { checkTokenBalance, checkNftBalance } from '~/lib/viem';
@@ -14,21 +14,17 @@ export async function POST(request: NextRequest) {
     }
     console.log(`[Verify] Received request for FID: ${userFid}, Quest ID: ${questId}`);
 
-    const { data: quest, error: questError } = await supabase
-      .from('quests').select('*').eq('id', questId).single();
-      
-    if (questError || !quest) {
-      return NextResponse.json({ success: false, message: 'Quest not found.' }, { status: 404 });
-    }
+    // Simulasi quest
+    const quest = {
+      id: questId,
+      title: 'Dummy Quest',
+      is_recurring: false,
+      verification_logic: 'share_link:',
+      points: 10
+    };
     console.log(`[Verify] Found quest: "${quest.title}"`);
 
-    if (!quest.is_recurring) {
-        const { data: existing } = await supabase.from('user_quest_completions')
-            .select('id').eq('user_fid', userFid).eq('quest_id', questId).limit(1);
-        if (existing && existing.length > 0) {
-            return NextResponse.json({ success: false, message: 'Quest already completed.' });
-        }
-    }
+  // Simulasi: quest belum pernah diselesaikan
 
     let isCompleted = false;
     const neynar = getNeynarClient();
@@ -96,8 +92,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (isCompleted) {
-      await supabase.from('user_quest_completions').insert({ user_fid: userFid, quest_id: quest.id }).throwOnError();
-      await supabase.rpc('add_user_points', { p_user_fid: userFid, p_points_to_add: quest.points }).throwOnError();
+      // Simulasi: quest berhasil diselesaikan dan poin diberikan
       return NextResponse.json({ success: true, message: `Quest "${quest.title}" completed! You earned ${quest.points} points.` });
     }
 

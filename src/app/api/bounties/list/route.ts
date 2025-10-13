@@ -18,7 +18,7 @@ function extractMetaTag(html: string, property: string): string {
 export async function GET() {
   try {
       // Kode supabase dihapus, sesuaikan dengan data dummy atau kosong
-      const approvedSubmissions = []; // Data dummy
+  const approvedSubmissions: Array<{ id: string, url: string }> = []; // Data dummy
       const supabaseError = null; // Tidak ada error
 
     if (supabaseError) throw supabaseError;
