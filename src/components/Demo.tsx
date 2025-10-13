@@ -55,9 +55,9 @@ export default function ThemedFeed() {
           The Farcaster App Store, supercharged.
         </p>
 
-    // ...existing code...
+    
         
-        {/* === PERUBAHAN DI SINI: TATA LETAK GRID DISESUAIKAN === */}
+        
         <div className="my-8 grid grid-cols-2 sm:grid-cols-3 gap-4">
             <ActionCard href="/bounties" icon={Trophy} title="Live Bounties" description="Claim rewards" className="col-span-2 sm:col-span-3 bg-gradient-to-br from-gold/20 to-neutral-800 border-gold/50 hover:bg-gold/10" />
             <ActionCard href="/news" icon={Newspaper} title="Web3 News" description="Stay updated" className="bg-neutral-800 border-neutral-700 hover:bg-neutral-700/50" />

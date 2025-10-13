@@ -1,7 +1,7 @@
 // src/app/api/user/completed-quests/route.ts
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '~/lib/supabase';
+// Supabase dihapus
 
 export const dynamic = 'force-dynamic';
 
@@ -15,17 +15,8 @@ export async function GET(request: NextRequest) {
 
   try {
     // Ambil quest_id DAN completed_at
-    const { data, error } = await supabase
-      .from('user_quest_completions')
-      .select('quest_id, completed_at') // <-- AMBIL KEDUA KOLOM
-      .eq('user_fid', userFid);
-
-    if (error) {
-      throw error;
-    }
-
-    // Kirim seluruh array objek ke frontend
-    return NextResponse.json({ completions: data || [] });
+    // Kode supabase dihapus, sesuaikan dengan data dummy atau kosong
+    return NextResponse.json({ completions: [] });
 
   } catch (err) {
     console.error('Error fetching completed quests:', err);

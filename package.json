@@ -18,7 +18,7 @@
     "@neynar/react": "^1.2.2",
     "@radix-ui/react-slot": "^1.2.3",
     "@solana/wallet-adapter-react": "^0.15.38",
-    "@supabase/supabase-js": "^2.50.2",
+    
     "@tanstack/react-query": "^5.61.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

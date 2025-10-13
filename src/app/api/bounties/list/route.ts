@@ -1,7 +1,7 @@
 // Lokasi file: src/app/api/bounties/list/route.ts
 
 import { NextResponse } from 'next/server';
-import { supabase } from '~/lib/supabase';
+// Supabase dihapus
 
 export const revalidate = 300;
 
@@ -17,11 +17,9 @@ function extractMetaTag(html: string, property: string): string {
 
 export async function GET() {
   try {
-    const { data: approvedSubmissions, error: supabaseError } = await supabase
-      .from('bounty_submissions')
-      .select('id, url')
-      .eq('status', 'approved')
-      .order('created_at', { ascending: false });
+      // Kode supabase dihapus, sesuaikan dengan data dummy atau kosong
+      const approvedSubmissions = []; // Data dummy
+      const supabaseError = null; // Tidak ada error
 
     if (supabaseError) throw supabaseError;
 
