@@ -110,7 +110,7 @@ export default function LeaderboardPage() {
             ) : (
               <div className="text-center py-10 text-gray-500">
                 <p>The leaderboard is empty.</p>
-                <p>Be the first to take the quiz this week!</p>
+                  <p></p>
               </div>
             )
           )}

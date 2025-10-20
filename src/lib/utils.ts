@@ -43,24 +43,25 @@ export function getSecretEnvVars() {
   return { seedPhrase, fid };
 }
 
-export function getMiniAppEmbedMetadata(ogImageUrl?: string) {
+export function getMiniAppEmbedMetadata() {
   return {
-    version: "next",
-    imageUrl: ogImageUrl ?? APP_OG_IMAGE_URL,
-    button: {
-      title: APP_BUTTON_TEXT,
-      action: {
-        type: "launch_frame",
-        name: APP_NAME,
-        url: APP_URL,
-        splashImageUrl: APP_SPLASH_URL,
-        iconUrl: APP_ICON_URL,
-        splashBackgroundColor: APP_SPLASH_BACKGROUND_COLOR,
-        description: APP_DESCRIPTION,
-        primaryCategory: APP_PRIMARY_CATEGORY,
-        tags: APP_TAGS,
-      },
+    frame: {
+      version: "1",
+      name: "Transact Rank",
+      iconUrl: "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/thumbnail_e27e1216-1186-405c-bc7a-dbc307f00b12-zpqgRfgBND6jJ6xwXFLe7rjM0UANJy",
+      homeUrl: "https://tax-cost-608.app.ohara.ai",
+      imageUrl: "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/thumbnail_e27e1216-1186-405c-bc7a-dbc307f00b12-zpqgRfgBND6jJ6xwXFLe7rjM0UANJy",
+      buttonTitle: "Open with Ohara",
+      splashImageUrl: "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/farcaster/splash_images/splash_image1.svg",
+      splashBackgroundColor: "#ffffff",
+      tags: ["ohara", "mini-app", "base", "farcaster"],
+      primaryCategory: "entertainment",
+      ogTitle: "Transact Rank",
+      ogImageUrl: "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/thumbnail_e27e1216-1186-405c-bc7a-dbc307f00b12-zpqgRfgBND6jJ6xwXFLe7rjM0UANJy"
     },
+    baseBuilder: {
+      allowedAddresses: ["0x01Eb409F38af4c4B25C16845bDF65dcff8F06668"]
+    }
   };
 }
 
