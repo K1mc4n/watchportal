@@ -13,7 +13,7 @@ Watch Portal is a comprehensive hub and directory for Farcaster Mini Apps and th
 -   **📰 Real-time News Feed:** Stay updated with the latest in Web3, crypto, and Farcaster, powered by the NewsAPI.
 -   **📝 Community Submissions:** A dedicated form for users to submit their own applications for review and inclusion in the portal.
 -   **🤖 AI-Powered Chat ("Coin Sage"):** An intelligent chatbot powered by Google's Gemini model, trained to answer questions about crypto, Farcaster, and Web3 concepts.
--   **🏆 Weekly Quiz & Leaderboard:** A gamified experience where users can test their knowledge with a weekly crypto quiz and compete for a spot on the leaderboard.
+ -   <!-- Weekly Quiz & Leaderboard removed -->
 -   **✅ Seamless Farcaster Integration:** Designed as a Farcaster Mini App for a native experience within clients like Warpcast.
 
 ## 🛠️ Tech Stack

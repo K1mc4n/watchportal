@@ -1,0 +1,19 @@
+{
+  "frame": {
+    "version": "1",
+    "name": "Transact Rank",
+    "iconUrl": "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/thumbnail_e27e1216-1186-405c-bc7a-dbc307f00b12-zpqgRfgBND6jJ6xwXFLe7rjM0UANJy",
+    "homeUrl": "https://tax-cost-608.app.ohara.ai",
+    "imageUrl": "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/thumbnail_e27e1216-1186-405c-bc7a-dbc307f00b12-zpqgRfgBND6jJ6xwXFLe7rjM0UANJy",
+    "buttonTitle": "Open with Ohara",
+    "splashImageUrl": "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/farcaster/splash_images/splash_image1.svg",
+    "splashBackgroundColor": "#ffffff",
+    "tags": ["ohara", "mini-app", "base", "farcaster"],
+    "primaryCategory": "entertainment",
+    "ogTitle": "Transact Rank",
+    "ogImageUrl": "https://usdozf7pplhxfvrl.public.blob.vercel-storage.com/thumbnail_e27e1216-1186-405c-bc7a-dbc307f00b12-zpqgRfgBND6jJ6xwXFLe7rjM0UANJy"
+  },
+  "baseBuilder": {
+    "allowedAddresses": ["0x01Eb409F38af4c4B25C16845bDF65dcff8F06668"]
+  }
+}

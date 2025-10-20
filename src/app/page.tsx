@@ -9,13 +9,6 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: APP_NAME,
-    description: APP_DESCRIPTION,
-    openGraph: {
-      title: APP_NAME,
-      description: APP_DESCRIPTION,
-      images: [APP_OG_IMAGE_URL],
-    },
     other: {
       'fc:frame': JSON.stringify(getMiniAppEmbedMetadata()),
     },
