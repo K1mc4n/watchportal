@@ -52,7 +52,7 @@ export function Header() {
   };
   
   const handleBuyLink = () => {
-    const buyUrl = 'https://streme.fun/token/0x2bb8fd57ac1e62194d56cd7680a067278c505e29';
+    const buyUrl = 'https://www.clanker.world/clanker/0x6e12d90023BBCA9548d4F4196b06dfcec55c0b07';
     if (actions?.openUrl) {
       actions.openUrl(buyUrl);
     } else {
