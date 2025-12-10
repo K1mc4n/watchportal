@@ -12,3 +12,26 @@ export const APP_WEBHOOK_URL = process.env.NEYNAR_API_KEY && process.env.NEYNAR_
     ? `https://api.neynar.com/f/app/${process.env.NEYNAR_CLIENT_ID}/event`
     : `${APP_URL}/api/webhook`;
 export const USE_WALLET = process.env.NEXT_PUBLIC_USE_WALLET === 'true';
+
+// Farcaster Frame Configuration
+export const FARCASTER_CONFIG = {
+  accountAssociation: {
+    header: process.env.FARCASTER_ACCOUNT_ASSOCIATION_HEADER,
+    payload: process.env.FARCASTER_ACCOUNT_ASSOCIATION_PAYLOAD,
+    signature: process.env.FARCASTER_ACCOUNT_ASSOCIATION_SIGNATURE,
+  },
+  frame: {
+    version: "1",
+    name: APP_NAME,
+    iconUrl: APP_ICON_URL,
+    homeUrl: APP_URL,
+    imageUrl: APP_OG_IMAGE_URL,
+    buttonTitle: APP_BUTTON_TEXT || "Launch Portal",
+    splashImageUrl: APP_SPLASH_URL,
+    splashBackgroundColor: APP_SPLASH_BACKGROUND_COLOR,
+    webhookUrl: APP_WEBHOOK_URL,
+  },
+  baseBuilder: {
+    allowedAddresses: process.env.BASE_BUILDER_ALLOWED_ADDRESSES?.split(',') || [],
+  },
+};
