@@ -1,4 +1,4 @@
-{
+Error: Vulnerable version of Next.js detected, please update immediately. Learn More: https://vercel.link/CVE-2025-66478{
   "accountAssociation": {
     "header": "eyJmaWQiOjI1MDU3NSwidHlwZSI6ImN1c3RvZHkiLCJrZXkiOiIweGM4QUJGNjc5ZTE0YWRkOUE2ZDZiNjg4MWNCRGI0YkNhNzQ4Q2QyRDAifQ",
     "payload": "eyJkb21haW4iOiJ3YXRjaHBvcnRhbC52ZXJjZWwuYXBwIn0",
