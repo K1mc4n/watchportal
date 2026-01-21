@@ -5,6 +5,21 @@ import ThemedFeed from "~/components/Demo";
 export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
+  const embed = {
+    version: "1",
+    imageUrl: "https://watchportal.vercel.app/og-image.png",
+    button: {
+      title: "Open Watchcoin",
+      action: {
+        type: "launch_miniapp",
+        name: "Watchcoin",
+        url: "https://watchportal.vercel.app",
+        splashImageUrl: "https://watchportal.vercel.app/splash.png",
+        splashBackgroundColor: "#111111",
+      },
+    },
+  };
+
   return {
     title: "Watchcoin",
     description: "Watchcoin Mini App",
@@ -14,13 +29,15 @@ export async function generateMetadata(): Promise<Metadata> {
       images: ["https://watchportal.vercel.app/og-image.png"],
     },
     other: {
-      "fc:frame": "vNext",
-      "fc:frame:image": "https://watchportal.vercel.app/og-image.png",
-      "fc:frame:aspect_ratio": "1.91:1",
-      "fc:frame:button:1": "Open Watchcoin",
-      "fc:frame:button:1:action": "link",
-      "fc:frame:button:1:target": "https://watchportal.vercel.app",
-      "fc:frame:post_url": "https://watchportal.vercel.app",
+      "fc:miniapp": JSON.stringify(embed),
+      // optional backward compatibility
+      "fc:frame": JSON.stringify({
+        ...embed,
+        button: {
+          ...embed.button,
+          action: { ...embed.button.action, type: "launch_frame" },
+        },
+      }),
     },
   };
 }
