@@ -1,26 +1,26 @@
 // src/app/page.tsx
-import type { Metadata } from 'next';
-import { APP_NAME, APP_DESCRIPTION, APP_OG_IMAGE_URL } from '~/lib/constants';
-import { getMiniAppEmbedMetadata } from '~/lib/utils';
-import ThemedFeed from '~/components/Demo';
+import type { Metadata } from "next";
+import ThemedFeed from "~/components/Demo";
 
-// ❌ HAPUS force-dynamic (biar crawler Farcaster bisa baca metadata statis)
-// export const dynamic = 'force-dynamic';
-
-// ✅ Boleh tetap pakai revalidate
 export const revalidate = 300;
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: APP_NAME || "Watchcoin",
-    description: APP_DESCRIPTION || "Watchcoin Mini App",
+    title: "Watchcoin",
+    description: "Watchcoin Mini App",
     openGraph: {
-      title: APP_NAME || "Watchcoin",
-      description: APP_DESCRIPTION || "Watchcoin Mini App",
-      images: [APP_OG_IMAGE_URL || "https://watchportal.vercel.app/og-image.png"],
+      title: "Watchcoin",
+      description: "Watchcoin Mini App",
+      images: ["https://watchportal.vercel.app/og-image.png"],
     },
     other: {
-      "fc:frame": JSON.stringify(getMiniAppEmbedMetadata()),
+      "fc:frame": "vNext",
+      "fc:frame:image": "https://watchportal.vercel.app/og-image.png",
+      "fc:frame:aspect_ratio": "1.91:1",
+      "fc:frame:button:1": "Open Watchcoin",
+      "fc:frame:button:1:action": "link",
+      "fc:frame:button:1:target": "https://watchportal.vercel.app",
+      "fc:frame:post_url": "https://watchportal.vercel.app",
     },
   };
 }
