@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getNeynarUser } from "../../../lib/neynar";
+import { getNeynarUser } from "../../../../lib/neynar";
 
 export async function GET(req: Request) {
   try {
@@ -24,16 +24,9 @@ export async function GET(req: Request) {
 
     const user = await getNeynarUser(fid);
 
-    if (!user) {
-      return NextResponse.json(
-        { error: "user not found" },
-        { status: 404 }
-      );
-    }
-
     return NextResponse.json(user);
   } catch (error) {
-    console.error("API error:", error);
+    console.error(error);
     return NextResponse.json(
       { error: "internal server error" },
       { status: 500 }
