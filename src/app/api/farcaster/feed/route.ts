@@ -6,7 +6,8 @@ export async function GET() {
     const client = getNeynarClient();
 
     const feed = await client.fetchFeed({
-      feedType: "trending",
+      // bypass enum TS
+      feedType: "trending" as any,
       limit: 20,
     });
 
