@@ -2,34 +2,25 @@
 
 import { useEffect, useState } from "react";
 
-type User = {
-  username: string;
-  display_name: string;
-  pfp_url: string;
-};
-
-type Cast = {
+type FeedCast = {
   hash: string;
   text: string;
+  author: {
+    username: string;
+    display_name: string;
+    pfp_url: string;
+  };
 };
 
 export default function Home() {
-  const [user, setUser] = useState<User | null>(null);
-  const [casts, setCasts] = useState<Cast[]>([]);
+  const [casts, setCasts] = useState<FeedCast[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const fid = 3; // ganti nanti
 
   useEffect(() => {
     async function load() {
-      const userRes = await fetch(`/api/farcaster/user?fid=${fid}`);
-      const userData = await userRes.json();
-      setUser(userData);
-
-      const castRes = await fetch(`/api/farcaster/casts?fid=${fid}`);
-      const castData = await castRes.json();
-      setCasts(castData.casts.slice(0, 5));
-
+      const res = await fetch("/api/farcaster/feed");
+      const data = await res.json();
+      setCasts(data.casts);
       setLoading(false);
     }
 
@@ -37,34 +28,40 @@ export default function Home() {
   }, []);
 
   if (loading) {
-    return <div style={{ padding: 20 }}>Loading...</div>;
+    return <div style={{ padding: 20 }}>Loading global feed...</div>;
   }
 
   return (
-    <main style={{ padding: 20 }}>
-      {user && (
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <img
-            src={user.pfp_url}
-            alt="pfp"
-            width={48}
-            height={48}
-            style={{ borderRadius: "50%" }}
-          />
-          <div>
-            <strong>{user.display_name}</strong>
-            <div>@{user.username}</div>
-          </div>
-        </div>
-      )}
-
-      <hr style={{ margin: "20px 0" }} />
-
-      <h3>Latest Casts</h3>
+    <main style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
+      <h2>🌍 Global Farcaster Feed</h2>
 
       {casts.map((cast) => (
-        <div key={cast.hash} style={{ marginBottom: 12 }}>
-          {cast.text}
+        <div
+          key={cast.hash}
+          style={{
+            padding: 12,
+            marginTop: 12,
+            border: "1px solid #e5e5e5",
+            borderRadius: 8,
+          }}
+        >
+          <div style={{ display: "flex", gap: 10, marginBottom: 6 }}>
+            <img
+              src={cast.author.pfp_url}
+              alt="pfp"
+              width={36}
+              height={36}
+              style={{ borderRadius: "50%" }}
+            />
+            <div>
+              <strong>{cast.author.display_name}</strong>
+              <div style={{ fontSize: 12, color: "#666" }}>
+                @{cast.author.username}
+              </div>
+            </div>
+          </div>
+
+          <div>{cast.text || <i>(no text)</i>}</div>
         </div>
       ))}
     </main>
