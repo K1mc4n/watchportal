@@ -1,22 +1,31 @@
 import { NextResponse } from "next/server";
-import { getNeynarClient } from "../../../../lib/neynar";
+import {
+  NEYNAR_API_KEY,
+  NEYNAR_BASE_URL,
+} from "../../../../lib/neynar";
 
 export async function GET() {
   try {
-    const client = getNeynarClient();
+    const res = await fetch(
+      `${NEYNAR_BASE_URL}/farcaster/feed?feed_type=global&limit=20`,
+      {
+        headers: {
+          accept: "application/json",
+          api_key: NEYNAR_API_KEY,
+        },
+        cache: "no-store",
+      }
+    );
 
-    const feed = await client.fetchFeed({
-      feedType: "global",
-      limit: 20,
-    });
+    const data = await res.json();
 
     return NextResponse.json({
-      casts: feed.casts,
+      casts: data.casts ?? [],
     });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
-      { error: "Failed to fetch feed" },
+      { error: "Failed to load global feed" },
       { status: 500 }
     );
   }
