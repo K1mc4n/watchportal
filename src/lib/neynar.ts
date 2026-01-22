@@ -1,42 +1,39 @@
 // src/lib/neynar.ts
 
-export const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY as string;
+import { NeynarAPIClient } from "@neynar/nodejs-sdk";
 
+/* ===============================
+   ENV
+================================ */
+export const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY as string;
 export const NEYNAR_BASE_URL = "https://api.neynar.com/v2";
 
 if (!NEYNAR_API_KEY) {
-  throw new Error("NEYNAR_API_KEY is missing in environment variables");
-}export async function sendNeynarMiniAppNotification({
-  fid,
-  title,
-  body,
-}: {
-  fid: number;
-  title: string;
-  body: string;
-}): Promise<SendMiniAppNotificationResult> {
+  throw new Error("NEYNAR_API_KEY is missing");
+}
+
+/* ===============================
+   CLIENT (SDK)
+================================ */
+let client: NeynarAPIClient | null = null;
+
+export function getNeynarClient() {
+  if (!client) {
+    client = new NeynarAPIClient(NEYNAR_API_KEY);
+  }
+  return client;
+}
+
+/* ===============================
+   USER HELPER
+================================ */
+export async function getNeynarUser(fid: number) {
   try {
     const client = getNeynarClient();
-    const targetFids = [fid];
-    const notification = {
-      title,
-      body,
-      target_url: APP_URL,
-    };
-
-    const result = await client.publishFrameNotifications({
-      targetFids,
-      notification,
-    });
-
-    if (result.notification_deliveries.length > 0) {
-      return { state: "success" };
-    } else if (result.notification_deliveries.length === 0) {
-      return { state: "no_token" };
-    } else {
-      return { state: "error", error: result || "Unknown error" };
-    }
-  } catch (error) {
-    return { state: "error", error };
+    const res = await client.fetchBulkUsers({ fids: [fid] });
+    return res.users?.[0] ?? null;
+  } catch (e) {
+    console.error("getNeynarUser error", e);
+    return null;
   }
 }
