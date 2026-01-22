@@ -1,40 +1,12 @@
-import { NeynarAPIClient, Configuration, WebhookUserCreated } from '@neynar/nodejs-sdk';
-import { APP_URL } from './constants';
+// src/lib/neynar.ts
 
-let neynarClient: NeynarAPIClient | null = null;
+export const NEYNAR_API_KEY = process.env.NEYNAR_API_KEY as string;
 
-export function getNeynarClient() {
-  if (!neynarClient) {
-    const apiKey = process.env.NEYNAR_API_KEY;
-    if (!apiKey) {
-      throw new Error('NEYNAR_API_KEY not configured');
-    }
-    const config = new Configuration({ apiKey });
-    neynarClient = new NeynarAPIClient(config);
-  }
-  return neynarClient;
-}
+export const NEYNAR_BASE_URL = "https://api.neynar.com/v2";
 
-type User = WebhookUserCreated['data'];
-
-export async function getNeynarUser(fid: number): Promise<User | null> {
-  try {
-    const client = getNeynarClient();
-    const usersResponse = await client.fetchBulkUsers({ fids: [fid] });
-    return usersResponse.users[0];
-  } catch (error) {
-    console.error('Error getting Neynar user:', error);
-    return null;
-  }
-}
-
-type SendMiniAppNotificationResult =
-  | { state: "error"; error: unknown }
-  | { state: "no_token" }
-  | { state: "rate_limit" }
-  | { state: "success" };
-
-export async function sendNeynarMiniAppNotification({
+if (!NEYNAR_API_KEY) {
+  throw new Error("NEYNAR_API_KEY is missing in environment variables");
+}export async function sendNeynarMiniAppNotification({
   fid,
   title,
   body,
