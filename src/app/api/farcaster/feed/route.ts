@@ -5,7 +5,8 @@ export async function GET() {
   try {
     const client = getNeynarClient();
 
-    const feed = await client.fetchTrendingCasts({
+    const feed = await client.fetchFeed({
+      feedType: "trending",
       limit: 20,
     });
 
