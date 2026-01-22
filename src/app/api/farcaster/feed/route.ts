@@ -5,12 +5,12 @@ export async function GET() {
   try {
     const client = getNeynarClient();
 
-    const result = await client.fetchRecentCasts({
-      limit: 20,
+    const result = await client.fetchAllCasts({
+      page_size: 20,
     });
 
     return NextResponse.json({
-      casts: result.casts,
+      casts: result.result.casts,
     });
   } catch (error) {
     console.error("Feed error:", error);
