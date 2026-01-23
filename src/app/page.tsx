@@ -1,11 +1,11 @@
+"use client";
+
 import { Header } from "@/components/ui/Header";
 import { Footer } from "@/components/ui/Footer";
 import { SponsorBanner } from "@/components/ui/SponsorBanner";
 import { MiniAppCard } from "@/components/ui/MiniAppCard";
 import { NewsCard } from "@/components/ui/NewsCard";
 import { miniAppsData } from "@/lib/miniAppsData";
-
-/* ================= PAGE ================= */
 
 export default function HomePage() {
   const handleLaunchApp = (app: any) => {
