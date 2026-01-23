@@ -36,9 +36,9 @@ export default function HomePage() {
         <h2 className="text-xl font-bold mb-4">⚡ Mini Apps</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {miniAppsData.map((app) => (
+          {miniAppsData.map((app, index) => (
             <MiniAppCard
-              key={app.slug}
+              key={index}
               app={app}
               onLaunch={handleLaunchApp}
             />
