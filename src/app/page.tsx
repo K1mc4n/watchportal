@@ -1,3 +1,5 @@
+"use client";
+
 import { Header } from "@/components/ui/Header";
 import { Footer } from "@/components/ui/Footer";
 import { SponsorBanner } from "@/components/ui/SponsorBanner";
@@ -5,12 +7,10 @@ import { MiniAppCard } from "@/components/ui/MiniAppCard";
 import { NewsCard } from "@/components/ui/NewsCard";
 
 import { miniAppsData } from "@/lib/miniAppsData";
-import type { MiniApp } from "@/types/miniApp";
 
 export default function HomePage() {
-  const handleLaunchApp = (app: MiniApp) => {
-    // redirect to mini app
-    if (app.url) {
+  const handleLaunchApp = (app: any) => {
+    if (app?.url) {
       window.open(app.url, "_blank");
     }
   };
@@ -46,7 +46,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== NEWS PREVIEW ===== */}
+      {/* ===== NEWS ===== */}
       <section className="px-4 mt-12">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">📰 Latest News</h2>
