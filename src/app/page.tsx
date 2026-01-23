@@ -7,14 +7,6 @@ import { miniAppsData } from "@/lib/miniAppsData";
 
 /* ================= TYPES ================= */
 
-type MiniApp = {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  url: string;
-};
-
 type Article = {
   title: string;
   summary: string;
@@ -27,8 +19,10 @@ type Article = {
 /* ================= PAGE ================= */
 
 export default function HomePage() {
-  const handleLaunchApp = (app: MiniApp) => {
-    window.open(app.url, "_blank");
+  const handleLaunchApp = (app: any) => {
+    if (app?.url) {
+      window.open(app.url, "_blank");
+    }
   };
 
   const featuredArticle: Article = {
@@ -62,7 +56,7 @@ export default function HomePage() {
         <h2 className="text-xl font-bold mb-4">Mini Apps</h2>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {miniAppsData.map((app: MiniApp) => (
+          {miniAppsData.map((app) => (
             <MiniAppCard
               key={app.id}
               app={app}
