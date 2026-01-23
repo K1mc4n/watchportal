@@ -15,6 +15,15 @@ export default function HomePage() {
     }
   };
 
+  const featuredArticle = {
+    title: "Base Ecosystem Is Growing Fast 🚀",
+    summary:
+      "The Base ecosystem continues to expand with new builders, mini apps, and Farcaster integrations going live every week.",
+    url: "https://base.org",
+    source: "Base",
+    publishedAt: new Date().toISOString(),
+  };
+
   return (
     <main className="min-h-screen bg-black text-white">
       
@@ -58,7 +67,7 @@ export default function HomePage() {
           </a>
         </div>
 
-        <NewsCard />
+        <NewsCard article={featuredArticle} />
       </section>
 
       {/* ===== FOOTER ===== */}
