@@ -5,8 +5,16 @@ import { MiniAppCard } from "@/components/ui/MiniAppCard";
 import { NewsCard } from "@/components/ui/NewsCard";
 
 import { miniAppsData } from "@/lib/miniAppsData";
+import type { MiniApp } from "@/types/miniApp";
 
 export default function HomePage() {
+  const handleLaunchApp = (app: MiniApp) => {
+    // redirect to mini app
+    if (app.url) {
+      window.open(app.url, "_blank");
+    }
+  };
+
   return (
     <main className="min-h-screen bg-black text-white">
       
@@ -29,7 +37,11 @@ export default function HomePage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {miniAppsData.map((app) => (
-            <MiniAppCard key={app.slug} app={app} />
+            <MiniAppCard
+              key={app.slug}
+              app={app}
+              onLaunch={handleLaunchApp}
+            />
           ))}
         </div>
       </section>
