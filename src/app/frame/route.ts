@@ -1,5 +1,5 @@
 export async function GET() {
-  const imageUrl = "https://watchportal.vercel.app/og.png";
+  const imageUrl = "https://watchportal.vercel.app/og-image.png";
 
   const html = `<!DOCTYPE html>
 <html>
