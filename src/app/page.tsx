@@ -5,17 +5,6 @@ import { MiniAppCard } from "@/components/ui/MiniAppCard";
 import { NewsCard } from "@/components/ui/NewsCard";
 import { miniAppsData } from "@/lib/miniAppsData";
 
-/* ================= TYPES ================= */
-
-type Article = {
-  title: string;
-  summary: string;
-  url: string;
-  source: string;
-  publishedAt: string;
-  urlToImage: string;
-};
-
 /* ================= PAGE ================= */
 
 export default function HomePage() {
@@ -25,12 +14,14 @@ export default function HomePage() {
     }
   };
 
-  const featuredArticle: Article = {
+  const featuredArticle = {
     title: "Base Ecosystem Is Growing Fast 🚀",
     summary:
       "The Base ecosystem continues to expand with new builders, mini apps, and Farcaster integrations going live every week.",
     url: "https://base.org",
-    source: "Base",
+    source: {
+      name: "Base",
+    },
     publishedAt: new Date().toISOString(),
     urlToImage:
       "https://images.unsplash.com/photo-1642104704074-907c0698cbd9",
