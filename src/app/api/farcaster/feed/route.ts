@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import { getNeynarClient } from "@/lib/neynar";
-import { FeedType } from "@neynar/nodejs-sdk";
 
 export async function GET() {
   try {
     const client = getNeynarClient();
 
     const result = await client.fetchFeed({
-      feedType: FeedType.Following, // ✅ FIX
+      feedType: "following", // ✅ STRING YANG VALID
       limit: 20,
     });
 
