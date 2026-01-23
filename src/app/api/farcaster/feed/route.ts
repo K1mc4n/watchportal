@@ -1,22 +1,20 @@
 import { NextResponse } from "next/server";
 import { getNeynarClient } from "@/lib/neynar";
+import { FeedType } from "@neynar/nodejs-sdk";
 
 export async function GET() {
   try {
     const client = getNeynarClient();
 
     const result = await client.fetchFeed({
-      feedType: "global",
+      feedType: FeedType.Following, // ✅ FIX
       limit: 20,
     });
 
-    return NextResponse.json({
-      casts: result.casts ?? [],
-    });
-  } catch (error) {
-    console.error("feed error:", error);
+    return NextResponse.json(result);
+  } catch (err: any) {
     return NextResponse.json(
-      { casts: [] },
+      { error: err.message },
       { status: 500 }
     );
   }
