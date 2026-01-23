@@ -15,7 +15,12 @@ export default function HomePage() {
 
       {/* ===== SPONSOR ===== */}
       <section className="px-4 mt-6">
-        <SponsorBanner />
+        <SponsorBanner
+          name="Base"
+          logoUrl="/base-logo.png"
+          description="Build and scale your onchain apps on Base — a secure, low-cost Ethereum L2."
+          learnMoreLink="https://base.org"
+        />
       </section>
 
       {/* ===== MINI APPS ===== */}
