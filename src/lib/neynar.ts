@@ -7,9 +7,11 @@ if (!apiKey) {
 }
 
 /**
- * Singleton Neynar client
+ * Singleton Neynar client (SDK versi baru)
  */
-const client = new NeynarAPIClient(apiKey);
+const client = new NeynarAPIClient({
+  apiKey: apiKey,
+});
 
 /**
  * Dipakai di API routes & server components
@@ -19,12 +21,12 @@ export function getNeynarClient() {
 }
 
 /**
- * Alias lama (biar backward compatible)
+ * Backward compatibility
  */
 export const neynarClient = client;
 
 /**
- * Helper ambil user Farcaster by FID
+ * Helper ambil user Farcaster
  */
 export async function getNeynarUser(fid: number) {
   return client.fetchBulkUsers({ fids: [fid] });
