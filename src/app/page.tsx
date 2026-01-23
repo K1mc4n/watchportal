@@ -1,97 +1,52 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import WalletChecker from "@/components/WalletChecker";
+import NewsSection from "@/components/NewsSection";
+import FarcasterFeed from "@/components/FarcasterFeed";
 
-type Author = {
-  username?: string;
-  display_name?: string;
-  pfp_url?: string;
-};
-
-type Cast = {
-  hash?: string;
-  text?: string;
-  author?: Author;
-};
-
-export default function Home() {
-  const [casts, setCasts] = useState<Cast[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/farcaster/feed");
-        const data = await res.json();
-
-        // 🔐 AMAN: cek semua kemungkinan
-        if (Array.isArray(data?.casts)) {
-          setCasts(data.casts);
-        } else if (Array.isArray(data)) {
-          setCasts(data);
-        } else {
-          console.warn("Unexpected feed shape:", data);
-          setCasts([]);
-        }
-      } catch (e) {
-        console.error(e);
-        setError("Failed to load feed");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    load();
-  }, []);
-
-  if (loading) {
-    return <div style={{ padding: 20 }}>Loading global feed...</div>;
-  }
-
-  if (error) {
-    return <div style={{ padding: 20, color: "red" }}>{error}</div>;
-  }
-
+export default function HomePage() {
   return (
-    <main style={{ padding: 20, maxWidth: 600, margin: "0 auto" }}>
-      <h2>🌍 Global Farcaster Feed</h2>
+    <main className="min-h-screen bg-black text-white px-4 py-6 space-y-10">
+      
+      {/* ===== HEADER ===== */}
+      <section className="text-center space-y-2">
+        <h1 className="text-3xl font-bold tracking-wide">
+          Watchcoin Portal
+        </h1>
+        <p className="text-gray-400 text-sm">
+          Your portal to crypto news, wallets, and Farcaster activity
+        </p>
+      </section>
 
-      {casts.length === 0 && (
-        <div style={{ marginTop: 20 }}>No casts found.</div>
-      )}
+      {/* ===== WALLET CHECKER ===== */}
+      <section className="bg-zinc-900 rounded-xl p-4">
+        <h2 className="text-lg font-semibold mb-3">
+          🔍 Check Wallet
+        </h2>
+        <WalletChecker />
+      </section>
 
-      {casts.map((cast, i) => (
-        <div
-          key={cast.hash ?? i}
-          style={{
-            padding: 12,
-            marginTop: 12,
-            border: "1px solid #e5e5e5",
-            borderRadius: 8,
-          }}
-        >
-          <div style={{ display: "flex", gap: 10, marginBottom: 6 }}>
-            {cast.author?.pfp_url && (
-              <img
-                src={cast.author.pfp_url}
-                alt="pfp"
-                width={36}
-                height={36}
-                style={{ borderRadius: "50%" }}
-              />
-            )}
-            <div>
-              <strong>{cast.author?.display_name ?? "Unknown"}</strong>
-              <div style={{ fontSize: 12, color: "#666" }}>
-                @{cast.author?.username ?? "unknown"}
-              </div>
-            </div>
-          </div>
+      {/* ===== NEWS ===== */}
+      <section className="bg-zinc-900 rounded-xl p-4">
+        <h2 className="text-lg font-semibold mb-3">
+          📰 Crypto News
+        </h2>
+        <NewsSection />
+      </section>
 
-          <div>{cast.text || <i>(no text)</i>}</div>
-        </div>
-      ))}
+      {/* ===== FARCASTER FEED ===== */}
+      <section className="bg-zinc-900 rounded-xl p-4">
+        <h2 className="text-lg font-semibold mb-3">
+          🟣 Farcaster – Recent Casts
+        </h2>
+        <FarcasterFeed />
+      </section>
+
+      {/* ===== FOOTER ===== */}
+      <footer className="text-center text-xs text-gray-500 pt-6">
+        © {new Date().getFullYear()} Watchcoin — Built on Base & Farcaster
+      </footer>
+
     </main>
   );
 }
