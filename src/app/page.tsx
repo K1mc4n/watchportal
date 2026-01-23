@@ -1,52 +1,51 @@
-"use client";
+import Header from "@/components/ui/Header";
+import Footer from "@/components/ui/Footer";
+import SponsorBanner from "@/components/ui/SponsorBanner";
+import MiniAppCard from "@/components/ui/MiniAppCard";
+import NewsCard from "@/components/ui/NewsCard";
 
-import WalletChecker from "@/components/WalletChecker";
-import NewsSection from "@/components/NewsSection";
-import FarcasterFeed from "@/components/FarcasterFeed";
+import { miniAppsData } from "@/lib/miniAppsData";
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-black text-white px-4 py-6 space-y-10">
+    <main className="min-h-screen bg-black text-white">
       
       {/* ===== HEADER ===== */}
-      <section className="text-center space-y-2">
-        <h1 className="text-3xl font-bold tracking-wide">
-          Watchcoin Portal
-        </h1>
-        <p className="text-gray-400 text-sm">
-          Your portal to crypto news, wallets, and Farcaster activity
-        </p>
+      <Header />
+
+      {/* ===== SPONSOR ===== */}
+      <section className="px-4 mt-6">
+        <SponsorBanner />
       </section>
 
-      {/* ===== WALLET CHECKER ===== */}
-      <section className="bg-zinc-900 rounded-xl p-4">
-        <h2 className="text-lg font-semibold mb-3">
-          🔍 Check Wallet
-        </h2>
-        <WalletChecker />
+      {/* ===== MINI APPS ===== */}
+      <section className="px-4 mt-10">
+        <h2 className="text-xl font-bold mb-4">⚡ Mini Apps</h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {miniAppsData.map((app) => (
+            <MiniAppCard key={app.slug} app={app} />
+          ))}
+        </div>
       </section>
 
-      {/* ===== NEWS ===== */}
-      <section className="bg-zinc-900 rounded-xl p-4">
-        <h2 className="text-lg font-semibold mb-3">
-          📰 Crypto News
-        </h2>
-        <NewsSection />
-      </section>
+      {/* ===== NEWS PREVIEW ===== */}
+      <section className="px-4 mt-12">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">📰 Latest News</h2>
+          <a
+            href="/news"
+            className="text-sm text-gray-400 hover:text-white"
+          >
+            View all →
+          </a>
+        </div>
 
-      {/* ===== FARCASTER FEED ===== */}
-      <section className="bg-zinc-900 rounded-xl p-4">
-        <h2 className="text-lg font-semibold mb-3">
-          🟣 Farcaster – Recent Casts
-        </h2>
-        <FarcasterFeed />
+        <NewsCard />
       </section>
 
       {/* ===== FOOTER ===== */}
-      <footer className="text-center text-xs text-gray-500 pt-6">
-        © {new Date().getFullYear()} Watchcoin — Built on Base & Farcaster
-      </footer>
-
+      <Footer />
     </main>
   );
 }
