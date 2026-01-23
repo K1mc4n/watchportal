@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getNeynarClient } from "@/lib/neynar";
 
-// ===== CONFIG =====
+// ================= CONFIG =================
 const EXTRA_FIDS = [250575];
 const MAX_FID = 1000;
 
@@ -9,7 +9,7 @@ const LIMIT_PER_FID = 1;
 const MAX_RESULT = 20;
 const HOURS_24 = 24 * 60 * 60 * 1000;
 const BATCH_SIZE = 50;
-// ==================
+// =========================================
 
 export async function GET() {
   try {
@@ -23,12 +23,12 @@ export async function GET() {
 
     let allCasts: any[] = [];
 
-    // batching biar gak rate-limit
+    // batching to avoid rate limit
     for (let i = 0; i < fids.length; i += BATCH_SIZE) {
       const batch = fids.slice(i, i + BATCH_SIZE);
 
       const requests = batch.map((fid) =>
-        client.fetchCastsByUser({
+        client.fetchCastsForUser({
           fid,
           limit: LIMIT_PER_FID,
         })
@@ -43,20 +43,20 @@ export async function GET() {
       }
     }
 
-    // filter last 24h
+    // filter last 24 hours
     const recentCasts = allCasts.filter((cast) => {
       const time = new Date(cast.timestamp).getTime();
       return now - time <= HOURS_24;
     });
 
-    // sort newest first
+    // newest first
     recentCasts.sort(
       (a, b) =>
         new Date(b.timestamp).getTime() -
         new Date(a.timestamp).getTime()
     );
 
-    // limit 20
+    // limit 20 casts
     const finalCasts = recentCasts.slice(0, MAX_RESULT);
 
     return NextResponse.json({
